@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Taskt",
+    "slug": "taskt",
+    "version": "0.0.1",
+    "scheme": "taskt",
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-sqlite"
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.s488u.taskt"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.s488u.taskt"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "726c512d-eda2-4884-8d22-a5b46d74ce38"
+      }
+    }
+  }
+}
