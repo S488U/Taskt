@@ -2,17 +2,15 @@ import { View, Pressable } from "react-native";
 import { useState, useEffect } from "react";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { cssInterop } from "nativewind";
+import { styled } from "nativewind";
 
 import SubTitle from "../../components/SubTitle";
 import AppText from "../../components/AppText";
 
 import { DAY_LABELS, formatTime, getPresetDays, hasFutureOccurrence, toTime24 } from "../../utils/scheduleUtils";
 
-cssInterop(FontAwesome6, {
-    className: {
-        target: "style",
-    },
+styled(FontAwesome6, {
+    className: "style",
 });
 
 const clockIcon = "clock";

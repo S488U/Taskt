@@ -9,13 +9,9 @@ import FloatingButton from "../../components/FloatingButton";
 
 // Icons
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { cssInterop } from "nativewind";
+import { styled } from "nativewind";
 
-cssInterop(FontAwesome6, {
-	className: {
-		target: "style",
-	},
-});
+styled(FontAwesome6, { className: "style"});
 
 // custom hooks
 import useGreeter from "../../hooks/useGreeter";
