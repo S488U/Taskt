@@ -1,7 +1,7 @@
 import { View, Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { cssInterop } from "nativewind";
+import { styled } from "nativewind";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 import SubTitle from "../../components/SubTitle";
@@ -9,11 +9,7 @@ import AppText from "../../components/AppText";
 
 import { formatDate, formatTime } from "../../utils/scheduleUtils";
 
-cssInterop(FontAwesome6, {
-	className: {
-		target: "style",
-	},
-});
+styled(FontAwesome6, { className: "style" });
 
 const OneTime = ({ data, setData, onErrorChange }) => {
 	const [timeEdited, setTimeEdited] = useState(false);

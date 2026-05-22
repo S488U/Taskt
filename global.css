@@ -1,3 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+@import "nativewind/theme";
+
+@theme {
+	--color-background: #F8FAFC;
+	--color-background-dark: #0F172A;
+	--color-surface: #FFFFFF;
+	--color-surface-dark: #1E293B;
+	--color-primary: #4F46E5;
+	--color-primary-dark: #6366F1;
+	--color-secondary: #64748B;
+	--color-secondary-dark: #94A3B8;
+	--color-text: #0F172A;
+	--color-text-dark: #FFFFFF;
+	--color-success: #10B981;
+	--color-danger: #EF4444;
+	--color-warning: #F59E0B;
+	--color-border: #E2E8F0;
+	--color-border-dark: #334155;
+
+	--font-inter: InterRegular;
+	--font-interMedium: InterMedium;
+	--font-interSBold: InterSemiBold;
+	--font-interBold: InterBold;
+
+	--radius-task: 12px;
+	--shadow-minimal: 0 1px 3px 0 rgb(0 0 0 / 5%);
+}

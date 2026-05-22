@@ -8,7 +8,7 @@ import { initDB } from "../db/migrations";
 
 // Styles
 import "../../global.css";
-
+	
 // Root
 const RootLayout = () => {
 	const [fontsLoaded] = useFonts({
@@ -25,8 +25,8 @@ const RootLayout = () => {
 		return null;
 	}
 	return (
-		<GestureHandlerRootView>
-			<SafeAreaView className="flex-1 bg-background">
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<SafeAreaView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
 				<StatusBar style="dark" />
 				<Stack screenOptions={{ headerShown: false }}></Stack>
 			</SafeAreaView>
