@@ -23,7 +23,7 @@ const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
 		return (
 			<TextInput
 				ref={ref}
-				className={`${customClass} ${multiline ? "h-32" : "h-14"} rounded-3xl border font-inter ${hasError ? "border-danger" : "border-border"} px-4 text-lg text-secondary caret-secondary`}
+				className={`${customClass} ${multiline ? "h-32" : "h-14"} rounded-3xl border font-inter ${hasError ? "border-danger" : "border-border"} px-4 pl-4	pr-4 text-lg text-secondary caret-secondary`}
 				textAlignVertical={multiline ? "top" : "center"}
 				placeholder={placeholder}
 				multiline={multiline}
