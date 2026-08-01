@@ -1,4 +1,6 @@
-export const DAY_LABELS = ["Su", "M", "T", "W", "Th", "F", "S"];
+import type { RecurringMode, Weekday } from "../features/tasks/task.types";
+
+export const DAY_LABELS: Weekday[] = ["Su", "M", "T", "W", "Th", "F", "S"];
 
 export const formatDate = (value: Date) =>
 	value.toLocaleDateString(undefined, {
@@ -21,7 +23,7 @@ export const toTime24 = (value: Date): string => {
 	return `${hh}:${mm}`;
 };
 
-export const getPresetDays = (mode: string): string[] => {
+export const getPresetDays = (mode: RecurringMode): Weekday[] => {
 	if (mode === "everyday") return DAY_LABELS;
 	if (mode === "today") return [DAY_LABELS[new Date().getDay()]];
 	if (mode === "tomorrow") return [DAY_LABELS[(new Date().getDay() + 1) % 7]];
@@ -29,7 +31,7 @@ export const getPresetDays = (mode: string): string[] => {
 };
 
 interface Schedule {
-	days: string[];
+	days: Weekday[];
 	time: string;
 }
 
@@ -56,7 +58,7 @@ export const hasFutureOccurrence = (schedule: Schedule, now = new Date()): boole
 	return false;
 };
 
-export const getTodaysDay = (): string => {
+export const getTodaysDay = (): Weekday => {
 	const todayIndex = new Date().getDay(); // 0–6
 	const day = DAY_LABELS[todayIndex];
 
