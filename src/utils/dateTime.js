@@ -84,4 +84,6 @@ export const today = () => {
 	return formattedDate;
 };
 
+console.log(parseDate("2026-08-01T13:36:05.456Z"));
+
 // console.log(parseDateTime("2026-02-10T20:45:02Z"));

@@ -1,12 +1,11 @@
-export type TaskKind = "one_time" | "recurring";
-
-export type TaskStatus = "pending" | "done";
-
-export type RecurringMode = "today" | "tomorrow" | "custom" | "everyday";
-
 export type Weekday = "Su" | "M" | "T" | "W" | "Th" | "F" | "S";
 
-export type Task = {
+export type TaskKind = "one_time" | "recurring";
+export type TaskFormPattern = "one-time" | "recurring";
+export type TaskStatus = "pending" | "done";
+export type RecurringMode = "today" | "tomorrow" | "custom" | "everyday";
+
+export type TaskEntity = {
 	id: string;
 	title: string;
 	description: string | null;
@@ -20,4 +19,31 @@ export type Task = {
 	updatedAt: string;
 	completedAt: string | null;
 	timezone: string | null;
+};
+
+export type Task = TaskEntity;
+
+export type OneTimeData = {
+	date: Date;
+};
+
+export type RecurringData = {
+	type: RecurringMode;
+	days: Weekday[];
+	time: Date;
+};
+
+export type TaskFormData = {
+	title: string;
+	description: string;
+	pattern: TaskFormPattern;
+	status: boolean;
+	oneTime: OneTimeData;
+	recurring: RecurringData;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
+export type StoredTaskFormData = TaskFormData & {
+	id: string;
 };
