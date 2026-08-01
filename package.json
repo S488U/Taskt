@@ -17,9 +17,11 @@
 	"type": "module",
 	"dependencies": {
 		"@expo/vector-icons": "^15.0.3",
+		"@js-temporal/polyfill": "^0.5.1",
 		"@react-native-async-storage/async-storage": "2.2.0",
 		"@react-native-community/datetimepicker": "8.6.0",
 		"@tailwindcss/postcss": "^4.3.0",
+		"clsx": "^2.1.1",
 		"expo": "~55.0.26",
 		"expo-constants": "~55.0.9",
 		"expo-font": "~55.0.8",
