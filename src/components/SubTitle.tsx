@@ -6,7 +6,7 @@ type SubTitleProps = {
 }
 
 const SubTitle = ({ title = "", customClass = "text-secondary" } : SubTitleProps) => {
-	return <AppText className={` ${customClass} my-1 px-2 font-interSBold`}>{title}</AppText>;
+	return <AppText className={`my-1 px-2 font-interSBold ${customClass}`}>{title}</AppText>;
 };
 
 export default SubTitle;
