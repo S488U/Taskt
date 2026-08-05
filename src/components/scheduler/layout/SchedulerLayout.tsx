@@ -32,10 +32,10 @@ const SchedulerLayout = ({ title, children }: SchedulerLayoutProps) => {
 						<AppText className="font-interSBold text-2xl capitalize">Select {title}</AppText>
 					</View>
 				</View>
-
-				{/* Children Passes */}
-				<View>{children}</View>
 			</View>
+
+			{/* Children Passes */}
+			<View className="flex-1">{children}</View>
 
 			{/* Pressable confirm Date */}
 			<View>
