@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo, useCallback } from "react";
+import React, { memo, useMemo, useCallback } from "react";
 import { View, Pressable } from "react-native";
 import { getCalendarDates } from "../../../utils/temporal/datePicker";
 import { Temporal } from "@js-temporal/polyfill";
@@ -14,26 +14,24 @@ type DatePickerGridProps = {
 
 const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
+// 100 / 7 = 14.2857...%
+// This allows the layout engine to handle the grid natively without JS measuring!
+const CELL_WIDTH_PERCENT = `${100 / 7}%`;
+
 const DateGrid = memo(
 	({ displayedMonth, selectedDate, today, setDisplayedMonth, setSelectedDate }: DatePickerGridProps) => {
-		const [gridWidth, setGridWidth] = useState(0);
-
-		const cellWidth = gridWidth / 7;
-
-		/*
-		 * Recalculate the 42 dates only when
-		 * displayedMonth changes.
-		 */
+		// 1. Memoize calendar dates
 		const calendarDates = useMemo(() => getCalendarDates(displayedMonth), [displayedMonth]);
+
+		// 2. Pre-calculate strings for O(1) comparison
+		// Temporal's toString() outputs YYYY-MM-DD, which is perfectly safe for equality checks
+		const todayStr = today.toString();
+		const selectedDateStr = selectedDate.toString();
 
 		const handleDatePress = useCallback(
 			(date: Temporal.PlainDate) => {
 				setSelectedDate(date);
 
-				/*
-				 * If the selected date belongs to another
-				 * month, move the calendar to that month.
-				 */
 				if (date.year !== displayedMonth.year || date.month !== displayedMonth.month) {
 					setDisplayedMonth(
 						Temporal.PlainYearMonth.from({
@@ -47,24 +45,14 @@ const DateGrid = memo(
 		);
 
 		return (
-			<View
-				className="mt-4"
-				onLayout={(event) => {
-					const width = event.nativeEvent.layout.width;
-
-					setGridWidth((previousWidth) => (previousWidth === width ? previousWidth : width));
-				}}
-			>
+			<View className="mt-4">
 				{/* Weekdays */}
 				<View className="flex-row">
 					{weekdays.map((day) => (
 						<View
 							key={day}
-							style={{
-								width: cellWidth,
-								height: 40,
-							}}
-							className="items-center justify-center"
+							style={{ width: CELL_WIDTH_PERCENT }}
+							className="h-10 items-center justify-center"
 						>
 							<AppText className="font-interSBold text-secondary text-sm">{day}</AppText>
 						</View>
@@ -76,41 +64,32 @@ const DateGrid = memo(
 					{calendarDates.map((date) => {
 						const isCurrentMonth = date.year === displayedMonth.year && date.month === displayedMonth.month;
 
-						const isToday = Temporal.PlainDate.compare(date, today) === 0;
-
-						const isSelected = Temporal.PlainDate.compare(date, selectedDate) === 0;
+						// 3. Fast string comparison (Vastly faster than Temporal.compare)
+						const dateStr = date.toString();
+						const isToday = dateStr === todayStr;
+						const isSelected = dateStr === selectedDateStr;
 
 						return (
 							<View
-								key={date.toString()}
-								style={{
-									width: cellWidth,
-									height: 44,
-								}}
-								className="items-center justify-center"
+								key={dateStr}
+								style={{ width: CELL_WIDTH_PERCENT }}
+								className="h-11 items-center justify-center"
 							>
 								<Pressable onPress={() => handleDatePress(date)}>
+									{/* 4. Pure NativeWind styling eliminates inline style object creation */}
 									<View
-										style={{
-											width: 35,
-											height: 35,
-											borderRadius: 20,
-
-											alignItems: "center",
-											justifyContent: "center",
-
-											backgroundColor: isSelected ? "#4F46E5" : "transparent",
-
-											borderWidth: isToday && !isSelected ? 2 : 0,
-
-											borderColor: "#4F46E5",
-										}}
+										className={`h-8.75 w-8.75 items-center justify-center rounded-full ${
+											isSelected ? "bg-primary" : "bg-transparent"
+										} ${isToday && !isSelected ? "border-primary border-2" : "border-0"}`}
 									>
 										<AppText
-											className="font-interMedium text-sm"
-											style={{
-												color: isSelected ? "#F8FAFC" : isCurrentMonth ? "#0F172A" : "#94A3B8",
-											}}
+											className={`font-interMedium text-sm ${
+												isSelected
+													? "text-[#F8FAFC]"
+													: !isCurrentMonth
+														? "text-[#94A3B8]"
+														: "text-[#0F172A]"
+											}`}
 										>
 											{date.day}
 										</AppText>
