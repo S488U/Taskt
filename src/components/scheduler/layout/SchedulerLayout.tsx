@@ -16,9 +16,8 @@ interface SchedulerLayoutProps {
 
 const SchedulerLayout = ({ title, children }: SchedulerLayoutProps) => {
 	return (
-		<View className="flex-1 flex-col justify-between px-6 py-4">
-			<StatusBar style="light" animated />
-
+		<View className="bg-background flex-1 flex-col justify-between px-6 py-4">
+			<StatusBar style="dark" animated />
 			{/* Header */}
 			<View className="mt-5 mb-5 justify-center">
 				<View className="w-full flex-row items-center">
