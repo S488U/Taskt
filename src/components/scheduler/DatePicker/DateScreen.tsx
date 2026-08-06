@@ -9,6 +9,7 @@ import { getToday, formatSelectedDate } from "../../../utils/temporal/datePicker
 import DateGrid from "./DateGrid";
 
 import SchedulerLayout from "../layout/SchedulerLayout";
+import { getCurrentTime } from "../../../utils/temporal/timePicker";
 
 const formatMonthYear = (displayedMonth: Temporal.PlainYearMonth) => {
 	return displayedMonth.toPlainDate({ day: 1 }).toLocaleString(undefined, {
@@ -92,13 +93,14 @@ const DateScreen = () => {
 
 				<View className="bg-secondary/8 my-5 h-0.5 w-full rounded-full" />
 
-				<View className="flex flex-row items-center justify-between">
-					<AppText className="text-secondary font-interMedium">Set Time (Optional)</AppText>
-
-					<Pressable onPress={() => router.push("/timepicker")}>
-						<AppText className="font-interSBold text-primary bg-primary/8 rounded-lg p-2">10:00 AM</AppText>
-					</Pressable>
-				</View>
+				<Pressable onPress={() => router.push("/timepicker")}>
+					<View className="flex flex-row items-center justify-between">
+						<AppText className="text-secondary font-interMedium">Set Time (Optional)</AppText>
+						<AppText className="font-interSBold text-primary bg-primary/8 rounded-lg p-2">
+							{getCurrentTime()}
+						</AppText>
+					</View>
+				</Pressable>
 			</View>
 		</SchedulerLayout>
 	);
