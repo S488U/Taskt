@@ -61,34 +61,34 @@ const SavedTasks = () => {
 	// console.log("Todo Data", todoData);
 
 	return (
+		// <>
+
 		<>
+			<ProgressCard todoExtra={todoExtra} />
+
+			<View className="mb-3 flex-row items-center justify-between px-2">
+				<AppText className="font-interBold text-text text-xl capitalize">
+					{viewData ? "all tasks" : "daily tasks"}
+				</AppText>
+				<AppText
+					onPress={() => setViewData((prev) => !prev)}
+					className="font-interSBold text-primary text-base capitalize"
+				>
+					{viewData ? "View Today" : "View All"}
+				</AppText>
+			</View>
 			{todoData.length > 0 ? (
-				<>
-					<ProgressCard todoExtra={todoExtra} />
-
-					<View className="mb-3 flex-row items-center justify-between px-2">
-						<AppText className="font-interBold text-text text-xl capitalize">
-							{viewData ? "all tasks" : "daily tasks"}
-						</AppText>
-						<AppText
-							onPress={() => setViewData((prev) => !prev)}
-							className="font-interSBold text-primary text-base capitalize"
-						>
-							{viewData ? "View Today" : "View All"}
-						</AppText>
-					</View>
-
-					<FlatList
-						className="flex-1"
-						data={todoData}
-						keyExtractor={(item, index) => String(item?.id ?? index)}
-						renderItem={({ item }) => <Card item={item} onDelete={handleDelete} onToggle={handleToggle} />}
-						contentContainerClassName="flex flex-col gap-2 pb-12 px-0.5"
-						showsVerticalScrollIndicator={false}
-						removeClippedSubviews={false}
-					/>
-				</>
+				<FlatList
+					className="flex-1"
+					data={todoData}
+					keyExtractor={(item, index) => String(item?.id ?? index)}
+					renderItem={({ item }) => <Card item={item} onDelete={handleDelete} onToggle={handleToggle} />}
+					contentContainerClassName="flex flex-col gap-2 pb-12 px-0.5"
+					showsVerticalScrollIndicator={false}
+					removeClippedSubviews={false}
+				/>
 			) : (
+				// </>
 				<View className="flex-1 items-center justify-center">
 					<AppText className="text-secondary italic">Add Task to list here</AppText>
 				</View>
