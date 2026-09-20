@@ -1,22 +1,17 @@
-export const CREATE_TASKS_TABLE = `
-    CREATE TABLE IF NOT EXISTS tasks (
-        id TEXT PRIMARY KEY NOT NULL,
-        title TEXT NOT NULL,
-        description TEXT,
-        kind TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'pending',
-        due_date TEXT,
-        due_time TEXT,
-        recurring_mode TEXT,
-        recurring_days TEXT NOT NULL DEFAULT '[]',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        completed_at TEXT,
-        timezone TEXT
-    );
-`;
+import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const CREATE_TASKS_INDEX = `
-    CREATE INDEX IF NOT EXISTS idx_task_status ON tasks(status);
-    CREATE INDEX IF NOT EXISTS idex_task_due_date ON tasks(due_date);
-`;
+export const taskTable = sqliteTable("task_table", {
+	id: text("id").primaryKey(),
+	title: text("title").notNull(),
+	description: text("description"),
+	kind: text("kind").notNull(),
+	status: text("status").notNull().default("pending"),
+	dueDate: text("due_date"),
+	dueTime: text("due_time"),
+	recurringMode: text("recurring_mode"),
+	recurringDays: text("recurring_days").notNull().default("[]"),
+	createdAt: text("created_at").notNull(),
+	updatedAt: text("updated_at").notNull(),
+	completedAt: text("completed_at"),
+	timezone: text("timezone"),
+});
