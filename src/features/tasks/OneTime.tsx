@@ -1,74 +1,80 @@
 import { View, Pressable } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { styled } from "nativewind";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import type { Dispatch, SetStateAction } from "react";
+import { router } from "expo-router";
+import { Temporal } from "@js-temporal/polyfill";
 
 import SubTitle from "../../components/SubTitle";
 import AppText from "../../components/AppText";
-
-import { formatDate, formatTime } from "../../utils/scheduleUtils";
-import type { OneTimeData, TaskFormData } from "./task.types";
+import { useTaskDraft } from "../../context/TaskDraftContext";
 
 styled(FontAwesome6, {
 	className: "style",
 });
 
-type OneTimePickerMode = "date" | "time";
+const clockIcon = "clock";
+const calendarIcon = "calendar-days";
+
+const formatTimeString = (timeStr?: string) => {
+	if (!timeStr) return "";
+	try {
+		const plainTime = Temporal.PlainTime.from(timeStr);
+		const hour12 = plainTime.hour % 12 || 12;
+		const hour = hour12.toString().padStart(2, "0");
+		const minute = plainTime.minute.toString().padStart(2, "0");
+		const meridian = plainTime.hour >= 12 ? "PM" : "AM";
+		return `${hour}:${minute} ${meridian}`;
+	} catch {
+		return timeStr;
+	}
+};
+
+const formatDateString = (dateStr?: string) => {
+	if (!dateStr) return "";
+	try {
+		const plainDate = Temporal.PlainDate.from(dateStr);
+		return plainDate.toLocaleString(undefined, {
+			day: "2-digit",
+			month: "short",
+			year: "numeric",
+		});
+	} catch {
+		return dateStr;
+	}
+};
 
 type OneTimeProps = {
-	data: OneTimeData;
-	setData: Dispatch<SetStateAction<TaskFormData>>;
 	onErrorChange?: (hasError: boolean) => void;
 };
 
-const OneTime = ({ data, setData, onErrorChange }: OneTimeProps) => {
-	const [timeEdited, setTimeEdited] = useState(false);
-	const clockIcon = "clock";
-	const calendarIcon = "calendar-days";
+const OneTime = ({ onErrorChange }: OneTimeProps) => {
+	const { draft } = useTaskDraft();
 
-	const currentDate = data.date;
-	const NOW = new Date();
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
-
-	const selectedDay = new Date(currentDate);
-	selectedDay.setHours(0, 0, 0, 0);
-
-	let isPast = false;
-	if (selectedDay < today) {
-		isPast = true;
-	} else if (selectedDay.getTime() === today.getTime() && timeEdited && currentDate < NOW) {
-		isPast = true;
-	}
+	const isPast = useMemo(() => {
+		try {
+			if (!draft.date) return false;
+			const today = Temporal.Now.plainDateISO();
+			const taskDate = Temporal.PlainDate.from(draft.date);
+			const dateCmp = Temporal.PlainDate.compare(taskDate, today);
+			if (dateCmp < 0) return true;
+			if (dateCmp === 0 && draft.time) {
+				const nowTime = Temporal.Now.plainTimeISO().round({
+					smallestUnit: "minute",
+					roundingMode: "floor",
+				});
+				const taskTime = Temporal.PlainTime.from(draft.time);
+				return Temporal.PlainTime.compare(taskTime, nowTime) < 0;
+			}
+			return false;
+		} catch {
+			return false;
+		}
+	}, [draft.date, draft.time]);
 
 	useEffect(() => {
 		onErrorChange?.(isPast);
 	}, [isPast, onErrorChange]);
-
-	const openPicker = (currentMode: OneTimePickerMode) => {
-		DateTimePickerAndroid.open({
-			value: currentDate,
-			onChange: (event, selectedDate) => {
-				if (event.type === "set" && selectedDate) {
-					setData((prev) => ({
-						...prev,
-						oneTime: {
-							...prev.oneTime,
-							date: selectedDate,
-						},
-					}));
-
-					if (currentMode === "time") {
-						setTimeEdited(true);
-					}
-				}
-			},
-			mode: currentMode,
-			is24Hour: false,
-		});
-	};
 
 	return (
 		<View>
@@ -77,7 +83,7 @@ const OneTime = ({ data, setData, onErrorChange }: OneTimeProps) => {
 				<View className="flex-row gap-3">
 					<Pressable
 						className={`flex-1 border ${isPast ? "border-danger" : "border-border"} bg-surface rounded-2xl px-4 py-3`}
-						onPress={() => openPicker("date")}
+						onPress={() => router.push("/datepicker")}
 					>
 						<AppText className={`text-xs ${isPast ? "text-danger" : "text-secondary"}`}>Date</AppText>
 						<View className="mt-1 flex-row items-center gap-2">
@@ -87,13 +93,13 @@ const OneTime = ({ data, setData, onErrorChange }: OneTimeProps) => {
 								className={`${isPast ? "text-danger" : "text-secondary"}`}
 							/>
 							<AppText className={`text-base ${isPast ? "text-danger" : "text-secondary"} leading-5`}>
-								{formatDate(currentDate)}
+								{formatDateString(draft.date)}
 							</AppText>
 						</View>
 					</Pressable>
 					<Pressable
 						className={`flex-1 border ${isPast ? "border-danger" : "border-border"} bg-surface rounded-2xl px-4 py-3`}
-						onPress={() => openPicker("time")}
+						onPress={() => router.push("/timepicker")}
 					>
 						<AppText className={`text-xs ${isPast ? "text-danger" : "text-secondary"}`}>Time</AppText>
 						<View className="mt-1 flex-row items-center gap-2">
@@ -105,7 +111,7 @@ const OneTime = ({ data, setData, onErrorChange }: OneTimeProps) => {
 							<AppText
 								className={`text-base ${isPast ? "text-danger" : "text-secondary"} leading-5 uppercase`}
 							>
-								{formatTime(currentDate)}
+								{formatTimeString(draft.time)}
 							</AppText>
 						</View>
 					</Pressable>
@@ -113,7 +119,7 @@ const OneTime = ({ data, setData, onErrorChange }: OneTimeProps) => {
 				{isPast && (
 					<View className="mt-1 ml-1">
 						<AppText className="text-danger text-xs">
-							Selected: {formatDate(currentDate)} at {formatTime(currentDate)}. Please choose a future
+							Selected: {formatDateString(draft.date)} at {formatTimeString(draft.time)}. Please choose a future
 							time.
 						</AppText>
 					</View>

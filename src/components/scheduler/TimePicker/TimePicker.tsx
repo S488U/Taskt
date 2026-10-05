@@ -26,6 +26,7 @@ const INFINITE_MINUTES = Array.from(
 
 export type TimePickerRef = {
 	scrollToTime: (hour: number, minute: number, meridian: Meridian) => void;
+	getTime: () => { hour: number; minute: number; meridian: Meridian };
 };
 
 const TimePicker = forwardRef<TimePickerRef>((_, ref) => {
@@ -75,7 +76,8 @@ const TimePicker = forwardRef<TimePickerRef>((_, ref) => {
 			minuteRef.current?.scrollToOffset({ offset: minuteIndex * ITEM_HEIGHT, animated: true });
 			meridianRef.current?.scrollToOffset({ offset: meridianIndex * ITEM_HEIGHT, animated: true });
 		},
-	}));
+		getTime: () => ({ hour, minute, meridian }),
+	}), [hour, minute, meridian, middleRepeat]);
 
 	// Scroll Handlers
 	const hourScrollHandler = useAnimatedScrollHandler({

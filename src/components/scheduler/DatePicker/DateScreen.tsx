@@ -10,6 +10,7 @@ import DateGrid from "./DateGrid";
 
 import SchedulerLayout from "../layout/SchedulerLayout";
 import { getCurrentTime } from "../../../utils/temporal/timePicker";
+import { useTaskDraft } from "../../../context/TaskDraftContext";
 
 const formatMonthYear = (displayedMonth: Temporal.PlainYearMonth) => {
 	return displayedMonth.toPlainDate({ day: 1 }).toLocaleString(undefined, {
@@ -19,6 +20,7 @@ const formatMonthYear = (displayedMonth: Temporal.PlainYearMonth) => {
 };
 
 const DateScreen = () => {
+	const { draft, updateDraft } = useTaskDraft();
 	const today = useMemo(() => getToday(), []);
 
 	/*
@@ -26,17 +28,34 @@ const DateScreen = () => {
 	 *
 	 * This is intentionally separate from selectedDate.
 	 */
-	const [displayedMonth, setDisplayedMonth] = useState<Temporal.PlainYearMonth>(() =>
-		Temporal.PlainYearMonth.from({
+	const [displayedMonth, setDisplayedMonth] = useState<Temporal.PlainYearMonth>(() => {
+		try {
+			if (draft.date) {
+				const initialDate = Temporal.PlainDate.from(draft.date);
+				return Temporal.PlainYearMonth.from({
+					year: initialDate.year,
+					month: initialDate.month,
+				});
+			}
+		} catch {
+			// fallback
+		}
+		return Temporal.PlainYearMonth.from({
 			year: today.year,
 			month: today.month,
-		})
-	);
+		});
+	});
 
 	/*
 	 * The actual date selected by the user.
 	 */
-	const [selectedDate, setSelectedDate] = useState<Temporal.PlainDate>(today);
+	const [selectedDate, setSelectedDate] = useState<Temporal.PlainDate>(() => {
+		try {
+			return draft.date ? Temporal.PlainDate.from(draft.date) : today;
+		} catch {
+			return today;
+		}
+	});
 
 	const monthTitle = useMemo(() => formatMonthYear(displayedMonth), [displayedMonth]);
 
@@ -56,8 +75,13 @@ const DateScreen = () => {
 		);
 	}, []);
 
+	const handleConfirm = () => {
+		updateDraft({ date: selectedDate.toString() });
+		router.back();
+	};
+
 	return (
-		<SchedulerLayout title="Date">
+		<SchedulerLayout title="Date" onConfirm={handleConfirm}>
 			{/* Calendar */}
 			<View className="bg-surface my-9 w-full rounded-xl p-5 px-7">
 				<View className="flex-row items-center justify-between">

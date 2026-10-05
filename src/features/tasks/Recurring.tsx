@@ -1,16 +1,16 @@
 import { View, Pressable } from "react-native";
-import { useState, useEffect } from "react";
-import type { Dispatch, SetStateAction } from "react";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { useState, useEffect, useMemo } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { styled } from "nativewind";
+import { router } from "expo-router";
+import { Temporal } from "@js-temporal/polyfill";
 
 import SubTitle from "../../components/SubTitle";
 import AppText from "../../components/AppText";
+import { useTaskDraft } from "../../context/TaskDraftContext";
 
-import type { RecurringData, RecurringMode, TaskFormData, Weekday } from "./task.types";
-
-import { DAY_LABELS, formatTime, getPresetDays, hasFutureOccurrence, toTime24 } from "../../utils/scheduleUtils";
+import type { RecurringMode, Weekday } from "./task.types";
+import { DAY_LABELS, getPresetDays, hasFutureOccurrence } from "../../utils/scheduleUtils";
 
 styled(FontAwesome6, {
 	className: "style",
@@ -18,26 +18,38 @@ styled(FontAwesome6, {
 
 const clockIcon = "clock";
 
+const formatTimeString = (timeStr?: string) => {
+	if (!timeStr) return "";
+	try {
+		const plainTime = Temporal.PlainTime.from(timeStr);
+		const hour12 = plainTime.hour % 12 || 12;
+		const hour = hour12.toString().padStart(2, "0");
+		const minute = plainTime.minute.toString().padStart(2, "0");
+		const meridian = plainTime.hour >= 12 ? "PM" : "AM";
+		return `${hour}:${minute} ${meridian}`;
+	} catch {
+		return timeStr;
+	}
+};
+
 type RecurringProps = {
-	data: RecurringData;
-	setData: Dispatch<SetStateAction<TaskFormData>>;
 	onErrorChange?: (hasError: boolean) => void;
 };
 
-const Recurring = ({ data, setData, onErrorChange }: RecurringProps) => {
+const Recurring = ({ onErrorChange }: RecurringProps) => {
+	const { draft, updateDraft } = useTaskDraft();
 	const [hasInteracted, setHasInteracted] = useState(false);
-	const NOW = new Date();
 
-	const isPast =
-		hasInteracted && data.days.length > 0
-			? !hasFutureOccurrence(
-					{
-						days: data.days,
-						time: toTime24(data.time),
-					},
-					NOW
-				)
-			: false;
+	const isPast = useMemo(() => {
+		if (!hasInteracted || !draft.recurringDays.length || !draft.time) return false;
+		return !hasFutureOccurrence(
+			{
+				days: draft.recurringDays,
+				time: draft.time,
+			},
+			new Date()
+		);
+	}, [hasInteracted, draft.recurringDays, draft.time]);
 
 	useEffect(() => {
 		onErrorChange?.(isPast);
@@ -45,61 +57,27 @@ const Recurring = ({ data, setData, onErrorChange }: RecurringProps) => {
 
 	const toggleDay = (day: Weekday) => {
 		setHasInteracted(true);
+		const currentDays = draft.recurringDays || [];
+		const days = currentDays.includes(day)
+			? currentDays.filter((d) => d !== day)
+			: [...currentDays, day];
 
-		setData((prev) => {
-			const days = prev.recurring.days.includes(day)
-				? prev.recurring.days.filter((d) => d !== day)
-				: [...prev.recurring.days, day];
-
-			return {
-				...prev,
-				recurring: {
-					...prev.recurring,
-					type: "custom",
-					days,
-				},
-			};
-		});
-	};
-
-	const openTimePicker = () => {
-		DateTimePickerAndroid.open({
-			value: data.time,
-
-			onChange: (event, selectedTime) => {
-				if (event.type === "set" && selectedTime) {
-					setHasInteracted(true);
-
-					setData((prev) => ({
-						...prev,
-						recurring: {
-							...prev.recurring,
-							time: selectedTime,
-						},
-					}));
-				}
-			},
-
-			mode: "time",
-			is24Hour: false,
+		updateDraft({
+			recurringMode: "custom",
+			recurringDays: days,
 		});
 	};
 
 	useEffect(() => {
-		if (data.type === "custom") return;
+		if (draft.recurringMode === "custom") return;
 
-		const presetDays = getPresetDays(data.type);
-
+		const presetDays = getPresetDays(draft.recurringMode);
 		if (presetDays.length) {
-			setData((prev) => ({
-				...prev,
-				recurring: {
-					...prev.recurring,
-					days: presetDays,
-				},
-			}));
+			updateDraft({
+				recurringDays: presetDays,
+			});
 		}
-	}, [data.type, setData]);
+	}, [draft.recurringMode]);
 
 	return (
 		<>
@@ -107,21 +85,18 @@ const Recurring = ({ data, setData, onErrorChange }: RecurringProps) => {
 				{(["today", "tomorrow", "everyday"] as RecurringMode[]).map((item) => (
 					<Pressable
 						key={item}
-						className={`flex-1 ${data.type === item ? "bg-primary" : "bg-surface"} border-border rounded-xl border`}
+						className={`flex-1 ${draft.recurringMode === item ? "bg-primary" : "bg-surface"} border-border rounded-xl border`}
 						onPress={() => {
 							setHasInteracted(true);
-							setData((prev) => ({
-								...prev,
-								recurring: {
-									...prev.recurring,
-									type: item,
-								},
-							}));
+							updateDraft({
+								recurringMode: item,
+								recurringDays: getPresetDays(item),
+							});
 						}}
 					>
 						<AppText
 							numberOfLines={1}
-							className={`${data.type === item ? "text-surface" : "text-secondary"} font-interMedium px-3 py-2 text-center text-sm capitalize`}
+							className={`${draft.recurringMode === item ? "text-surface" : "text-secondary"} font-interMedium px-3 py-2 text-center text-sm capitalize`}
 						>
 							{item}
 						</AppText>
@@ -135,10 +110,10 @@ const Recurring = ({ data, setData, onErrorChange }: RecurringProps) => {
 						<Pressable
 							key={item}
 							onPress={() => toggleDay(item)}
-							className={`flex-1 ${data.days.includes(item) ? "bg-primary" : "bg-surface"} border-border rounded-xl border`}
+							className={`flex-1 ${draft.recurringDays?.includes(item) ? "bg-primary" : "bg-surface"} border-border rounded-xl border`}
 						>
 							<AppText
-								className={`${data.days.includes(item) ? "text-surface" : "text-secondary"} font-interMedium px-3 py-3 text-center text-sm capitalize`}
+								className={`${draft.recurringDays?.includes(item) ? "text-surface" : "text-secondary"} font-interMedium px-3 py-3 text-center text-sm capitalize`}
 							>
 								{item}
 							</AppText>
@@ -149,7 +124,7 @@ const Recurring = ({ data, setData, onErrorChange }: RecurringProps) => {
 			<View>
 				<SubTitle title="Time" />
 				<Pressable
-					onPress={openTimePicker}
+					onPress={() => router.push("/timepicker")}
 					className={`flex-row items-center justify-center gap-2 border ${isPast ? "border-danger" : "border-border"} bg-surface rounded-xl px-4 py-3`}
 				>
 					<FontAwesome6
@@ -160,7 +135,7 @@ const Recurring = ({ data, setData, onErrorChange }: RecurringProps) => {
 					<AppText
 						className={`${isPast ? "text-danger" : "text-secondary"} font-interMedium text-center text-base uppercase`}
 					>
-						{formatTime(data.time)}
+						{formatTimeString(draft.time)}
 					</AppText>
 				</Pressable>
 				{isPast && (
