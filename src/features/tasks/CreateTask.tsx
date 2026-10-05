@@ -1,9 +1,11 @@
 import { View, Pressable, Animated, Easing, Keyboard } from "react-native";
-
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import type { TextInput } from "react-native";
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
+import { Temporal } from "@js-temporal/polyfill";
 
 import SubTitle from "../../components/SubTitle";
 import OneTime from "./OneTime";
@@ -11,8 +13,9 @@ import Recurring from "./Recurring";
 import AppTextInput from "../../components/AppTextInput";
 import AppText from "../../components/AppText";
 
-import { storeData } from "../../utils/storageUtils";
-import type { TaskFormData } from "./task.types";
+import { useTaskDraft } from "../../context/TaskDraftContext";
+import { taskService } from "../../db/taskService";
+import type { TaskEntity } from "./task.types";
 
 const CreateTask = () => {
 	const [patternWidth, setPatternWidth] = useState(0);
@@ -22,36 +25,20 @@ const CreateTask = () => {
 		oneTime: false,
 		recurring: false,
 	});
-	const [todoData, setTodoData] = useState<TaskFormData>({
-		title: "",
-		description: "",
-		pattern: "one-time",
-		status: false,
-		oneTime: {
-			date: new Date(),
-		},
-		recurring: {
-			type: "today",
-			days: [],
-			time: new Date(),
-		},
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	});
+
+	const { draft, updateDraft, resetDraft } = useTaskDraft();
 
 	const placeHolderTextColor = "#64748B";
 	const patternAnim = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
 		Animated.timing(patternAnim, {
-			toValue: todoData.pattern === "one-time" ? 0 : 1,
+			toValue: draft.pattern === "one-time" ? 0 : 1,
 			duration: 220,
 			easing: Easing.out(Easing.cubic),
 			useNativeDriver: true,
 		}).start();
-
-		// console.log(todoData);
-	}, [todoData.pattern, patternAnim]);
+	}, [draft.pattern, patternAnim]);
 
 	const sliderTrackWidth = Math.max(patternWidth - 8, 0);
 	const sliderSegmentWidth = sliderTrackWidth / 2;
@@ -60,12 +47,12 @@ const CreateTask = () => {
 		outputRange: [0, sliderSegmentWidth],
 	});
 
-	const isAddDisabled = todoData.pattern === "one-time" ? validationErrors.oneTime : validationErrors.recurring;
+	const isAddDisabled = draft.pattern === "one-time" ? validationErrors.oneTime : validationErrors.recurring;
 
 	const handleAddTask = async () => {
 		Keyboard.dismiss();
 
-		if (todoData.title.trim() === "") {
+		if (draft.title.trim() === "") {
 			setValidationErrors((prev) => ({
 				...prev,
 				title: true,
@@ -73,20 +60,46 @@ const CreateTask = () => {
 			return;
 		}
 
-		const storeTodoData = await storeData("todoData", todoData);
+		try {
+			const id = uuidv4();
+			const now = Temporal.Now.instant().toString();
+			const timezone = Temporal.Now.timeZoneId();
 
-		if (!storeTodoData?.success) {
-			return;
+			const newTask: TaskEntity = {
+				id,
+				title: draft.title.trim(),
+				description: draft.description?.trim() || null,
+				kind: draft.pattern === "one-time" ? "one_time" : "recurring",
+				status: "pending",
+				dueDate: draft.pattern === "one-time" ? draft.date : null,
+				dueTime: draft.pattern === "one-time" ? draft.time : null,
+				recurringMode: draft.pattern === "recurring" ? draft.recurringMode : null,
+				recurringDays: draft.pattern === "recurring" ? draft.recurringDays : [],
+				createdAt: now,
+				updatedAt: now,
+				completedAt: null,
+				timezone,
+			};
+
+			await taskService.createTask(newTask);
+			resetDraft();
+			router.dismissAll();
+		} catch (error) {
+			console.error("Error creating task:", error);
 		}
-
-		router.dismissAll();
 	};
 
 	return (
 		<View className="bg-background flex-1">
 			<View className="border-border bg-surface m-2 flex-1 rounded-2xl border px-3 py-3 pb-2">
 				<View className="mt-3 flex-row items-center">
-					<Pressable onPress={() => router.dismissAll()} className="rounded-3xl px-3 py-1.5 pl-0">
+					<Pressable
+						onPress={() => {
+							resetDraft();
+							router.dismissAll();
+						}}
+						className="rounded-3xl px-3 py-1.5 pl-0"
+					>
 						<MaterialIcons name="arrow-back-ios-new" size={24} />
 					</Pressable>
 					<AppText className="font-interSBold text-text text-4xl">New Task</AppText>
@@ -102,7 +115,7 @@ const CreateTask = () => {
 							blurOnSubmit={false}
 							onSubmitEditing={() => descriptionInputRef.current?.focus()}
 							onChangeText={(text) => {
-								setTodoData((prev) => ({ ...prev, title: text }));
+								updateDraft({ title: text });
 								if (validationErrors.title && text.trim() !== "") {
 									setValidationErrors((prev) => ({ ...prev, title: false }));
 								}
@@ -110,7 +123,7 @@ const CreateTask = () => {
 							onFocus={() =>
 								setValidationErrors((prev) => (prev.title ? { ...prev, title: false } : prev))
 							}
-							value={todoData.title}
+							value={draft.title}
 						/>
 						{validationErrors.title && (
 							<AppText className="text-danger ml-3 text-xs capitalize">Title is required!</AppText>
@@ -122,13 +135,13 @@ const CreateTask = () => {
 							ref={descriptionInputRef}
 							placeholder="Enter Task Description"
 							placeholderTextColor={placeHolderTextColor}
-							onChangeText={(text) => setTodoData((prev) => ({ ...prev, description: text }))}
+							onChangeText={(text) => updateDraft({ description: text })}
 							returnKeyType="done"
 							blurOnSubmit
 							submitBehavior="blurAndSubmit"
 							onSubmitEditing={handleAddTask}
 							multiline
-							value={todoData.description}
+							value={draft.description}
 						/>
 					</View>
 
@@ -148,24 +161,24 @@ const CreateTask = () => {
 							/>
 							<Pressable
 								onPress={() => {
-									setTodoData((prev) => ({ ...prev, pattern: "one-time" }));
+									updateDraft({ pattern: "one-time" });
 								}}
 								className="flex-1 rounded-xl"
 							>
 								<AppText
-									className={`font-interMedium py-2 text-center text-sm ${todoData.pattern === "one-time" ? "text-surface" : "text-secondary"}`}
+									className={`font-interMedium py-2 text-center text-sm ${draft.pattern === "one-time" ? "text-surface" : "text-secondary"}`}
 								>
 									One time
 								</AppText>
 							</Pressable>
 							<Pressable
 								onPress={() => {
-									setTodoData((prev) => ({ ...prev, pattern: "recurring" }));
+									updateDraft({ pattern: "recurring" });
 								}}
 								className="flex-1 rounded-xl"
 							>
 								<AppText
-									className={`font-interMedium py-2 text-center text-sm ${todoData.pattern === "recurring" ? "text-surface" : "text-secondary"}`}
+									className={`font-interMedium py-2 text-center text-sm ${draft.pattern === "recurring" ? "text-surface" : "text-secondary"}`}
 								>
 									Recurring
 								</AppText>
@@ -173,10 +186,8 @@ const CreateTask = () => {
 						</View>
 					</View>
 
-					{todoData.pattern === "one-time" && (
+					{draft.pattern === "one-time" && (
 						<OneTime
-							data={todoData.oneTime}
-							setData={setTodoData}
 							onErrorChange={(hasError: boolean) =>
 								setValidationErrors((prev) =>
 									prev.oneTime === hasError ? prev : { ...prev, oneTime: hasError }
@@ -185,10 +196,8 @@ const CreateTask = () => {
 						/>
 					)}
 
-					{todoData.pattern === "recurring" && (
+					{draft.pattern === "recurring" && (
 						<Recurring
-							data={todoData.recurring}
-							setData={setTodoData}
 							onErrorChange={(hasError: boolean) =>
 								setValidationErrors((prev) =>
 									prev.recurring === hasError ? prev : { ...prev, recurring: hasError }

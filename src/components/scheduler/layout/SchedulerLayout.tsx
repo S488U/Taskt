@@ -12,9 +12,10 @@ const StyledIcon = styled(Ionicons, {
 interface SchedulerLayoutProps {
 	title: string;
 	children: React.ReactNode;
+	onConfirm?: () => void;
 }
 
-const SchedulerLayout = ({ title, children }: SchedulerLayoutProps) => {
+const SchedulerLayout = ({ title, children, onConfirm }: SchedulerLayoutProps) => {
 	return (
 		<View className="bg-background flex-1 flex-col justify-between px-6 py-4">
 			<StatusBar style="dark" animated />
@@ -39,7 +40,7 @@ const SchedulerLayout = ({ title, children }: SchedulerLayoutProps) => {
 			{/* Pressable confirm Date */}
 			<View>
 				<Pressable
-					onPress={() => router.push("/")}
+					onPress={onConfirm ?? (() => router.back())}
 					className="bg-primary rounded-2xl border border-slate-400 py-1"
 				>
 					<AppText className="text-surface my-3 text-center text-xl capitalize">Confirm {title}</AppText>

@@ -4,8 +4,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from "react-native-reanimated";
 
-import { removeItem, updateItemStatus } from "../utils/storageUtils";
-
 // components
 import AppText from "./AppText";
 import CheckBox from "./CheckBox";
@@ -82,10 +80,10 @@ const Card = ({ item, onDelete, onToggle }) => {
 	const [cardWidth, setCardWidth] = useState(0);
 
 	const id = item.id;
-	const checked = !!item.status;
+	const checked = item.status === "done" || item.status === true;
 	const title = item.title?.trim() || "";
 	const desc = item.description?.trim();
-	const pattern = item.pattern?.trim();
+	const pattern = item.kind ? (item.kind === "one_time" ? "one-time" : "recurring") : item.pattern?.trim();
 	let newTitle = title;
 	if (title.length > 30) {
 		newTitle = title.substring(0, 30) + "...";
@@ -95,12 +93,8 @@ const Card = ({ item, onDelete, onToggle }) => {
 	const strikeSubText = checked ? "line-through text-secondary/20" : "text-secondary";
 	const strikeBg = checked ? "bg-background" : "bg-surface";
 
-	const handleToggle = async (nextValue) => {
-		const result = await updateItemStatus("todoData", id, nextValue);
-
-		if (result?.success) {
-			onToggle?.(id, nextValue);
-		}
+	const handleToggle = (nextValue) => {
+		onToggle?.(id, nextValue);
 	};
 
 	return (
@@ -108,11 +102,8 @@ const Card = ({ item, onDelete, onToggle }) => {
 			key={item.id}
 			overshootRight={true}
 			rightThreshold={40}
-			onSwipeableOpen={async () => {
-				const result = await removeItem("todoData", id);
-				if (result?.success) {
-					onDelete?.(id);
-				}
+			onSwipeableOpen={() => {
+				onDelete?.(id);
 			}}
 			renderRightActions={(progress, dragX) => (
 				<RightAction progress={progress} dragX={dragX} cardWidth={cardWidth} />
