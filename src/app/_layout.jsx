@@ -11,6 +11,7 @@ import migrations from "../../drizzle/migrations";
 // Styles
 import "../../global.css";
 import { useEffect } from "react";
+import { SettingsProvider } from "../context/SettingsContext";
 
 // Root
 const RootLayout = () => {
@@ -40,10 +41,12 @@ const RootLayout = () => {
 	}
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
-			<SafeAreaView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
-				<StatusBar style="dark" />
-				<Stack screenOptions={{ headerShown: false }}></Stack>
-			</SafeAreaView>
+			<SettingsProvider>
+				<SafeAreaView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
+					<StatusBar style="dark" />
+					<Stack screenOptions={{ headerShown: false }}></Stack>
+				</SafeAreaView>
+			</SettingsProvider>
 		</GestureHandlerRootView>
 	);
 };
