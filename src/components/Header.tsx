@@ -1,15 +1,23 @@
-import { View } from 'react-native';
+import { View } from "react-native";
 import AppText from "./AppText";
 
-const Header = ({ title = "Todo Personal" } : { title: string }) => {
-    
-    return (
-        <View className='w-full'>
-            <AppText className='font-interSBold capitalize text-4xl text-text leading-[44px]'>
-                {title}
-            </AppText>
-        </View>
-    );
+interface HeaderProps {
+	title: string;
+	customClass?: string;
+}
+
+const Header = ({ title = "Todo Personal", customClass }: HeaderProps) => {
+	return (
+		<View className="w-full">
+			<AppText
+				className={`font-interSBold text-text capitalize ${
+					customClass ? customClass : "text-4xl leading-[44px]"
+				}`}
+			>
+				{title}
+			</AppText>
+		</View>
+	);
 };
 
 export default Header;

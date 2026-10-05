@@ -13,6 +13,7 @@ import { styled } from "nativewind";
 
 // custom hooks
 import useGreeter from "../../hooks/useGreeter";
+import { useSettings } from "../../context/SettingsContext";
 
 styled(FontAwesome6, {
 	className: "style",
@@ -20,12 +21,17 @@ styled(FontAwesome6, {
 
 const TodoScreen = () => {
 	const { greeter } = useGreeter();
+	const { greeterSize } = useSettings();
 
 	return (
 		<View className="bg-background relative flex-1 p-3 px-4">
 			{/* <Header title="Taskt"/> */}
+
+			<Pressable onPress={() => router.push("/settings")}>
+				<Header title={greeter} customClass={greeterSize ? "text-2xl leading-7" : "text-4xl leading-[44px]"} />
+			</Pressable>
+
 			<Pressable onPress={() => router.push("/datepicker")}>
-				<Header title={greeter} />
 				<Today />
 			</Pressable>
 

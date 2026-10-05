@@ -26,6 +26,28 @@ export const storeData = async (name, value) => {
 	}
 };
 
+export const storeSettings = async (name, value) => {
+	if (typeof name !== "string" || name.trim() === "") return null;
+	try {
+		await AsyncStorage.setItem(name, JSON.stringify(value));
+		return { success: true };
+	} catch (error) {
+		console.log("Error[storeSettings]: ", error);
+		return { success: false, error };
+	}
+};
+
+export const loadSettings = async (name) => {
+	if (typeof name !== "string" || name.trim() === "") return null;
+	try {
+		const data = await AsyncStorage.getItem(name);
+		return data !== null ? JSON.parse(data) : null;
+	} catch (error) {
+		console.log("Error[loadSettings]: ", error);
+		return null;
+	}
+};
+
 export const loadData = async (name, viewFullData) => {
 	if (typeof name !== "string" || name.trim() === "") return null;
 
