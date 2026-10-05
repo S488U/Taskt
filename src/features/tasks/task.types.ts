@@ -47,3 +47,13 @@ export type TaskFormData = {
 export type StoredTaskFormData = TaskFormData & {
 	id: string;
 };
+
+export type TaskDraft = {
+	title: string;
+	description: string;
+	pattern: TaskFormPattern;
+	date: string;
+	time: string;
+	recurringMode: RecurringMode;
+	recurringDays: Weekday[];
+};
