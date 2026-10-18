@@ -13,6 +13,7 @@ import "../../global.css";
 import { useEffect } from "react";
 import { SettingsProvider } from "../context/SettingsContext";
 import { TaskDraftProvider } from "../context/TaskDraftContext";
+import { setupNotificationChannel, requestNotificationPermissions } from "../utils/notificationService";
 
 // Root
 const RootLayout = () => {
@@ -23,18 +24,25 @@ const RootLayout = () => {
 		InterBold: require("../../assets/fonts/Inter-Bold.ttf"),
 	});
 
-	// Initialise Database
+	// Initialise Database & Notifications
 	useEffect(() => {
-		const initialiseDatabase = async () => {
+		const initialiseApp = async () => {
 			try {
 				await migrate(db, migrations);
 				console.log("Database migrations completed successfully");
 			} catch (error) {
 				console.error("Error connecting to database:", error);
 			}
+
+			try {
+				await setupNotificationChannel();
+				await requestNotificationPermissions();
+			} catch (error) {
+				console.error("Error setting up notifications:", error);
+			}
 		};
 
-		initialiseDatabase();
+		initialiseApp();
 	}, []);
 
 	if (!fontsLoaded) {

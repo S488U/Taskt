@@ -23,6 +23,21 @@ export const taskService = {
 			.where(eq(taskTable.id, id));
 	},
 
+	getTaskById: async (id: string): Promise<TaskEntity | undefined> => {
+		const results = await db.select().from(taskTable).where(eq(taskTable.id, id));
+		return results[0];
+	},
+
+	updateNotificationId: async (id: string, notificationId: string | null) => {
+		return await db
+			.update(taskTable)
+			.set({
+				notificationId,
+				updatedAt: new Date().toISOString(),
+			})
+			.where(eq(taskTable.id, id));
+	},
+
 	deleteTask: async (id: string) => {
 		return await db.delete(taskTable).where(eq(taskTable.id, id));
 	},

@@ -1,0 +1,1 @@
+ALTER TABLE `task_table` ADD `notification_id` text;

@@ -15,4 +15,5 @@ export const taskTable = sqliteTable("task_table", {
 	updatedAt: text("updated_at").notNull(),
 	completedAt: text("completed_at"),
 	timezone: text("timezone"),
+	notificationId: text("notification_id"),
 });

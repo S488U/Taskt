@@ -19,6 +19,7 @@ export type TaskEntity = {
 	updatedAt: string;
 	completedAt: string | null;
 	timezone: string | null;
+	notificationId?: string | null;
 };
 
 export type Task = TaskEntity;
