@@ -11,6 +11,7 @@ import ProgressCard from "../../components/ProgressCard";
 import { taskService } from "../../db/taskService";
 import type { TaskEntity, TaskStatus } from "./task.types";
 import { DAY_LABELS } from "../../utils/scheduleUtils";
+import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
 
 const SavedTasks = () => {
 	const [allTasks, setAllTasks] = useState<TaskEntity[]>([]);
@@ -62,6 +63,8 @@ const SavedTasks = () => {
 
 	const handleToggle = async (id: string, nextChecked: boolean) => {
 		const nextStatus: TaskStatus = nextChecked ? "done" : "pending";
+		const currentTask = allTasks.find((item) => item.id === id);
+
 		setAllTasks((prev) =>
 			prev.map((item) =>
 				item.id === id
@@ -72,16 +75,42 @@ const SavedTasks = () => {
 					: item
 			)
 		);
+
 		try {
 			await taskService.updateStatus(id, nextStatus);
+
+			if (nextChecked) {
+				// Mark as done: cancel any existing scheduled reminder
+				if (currentTask?.notificationId) {
+					await cancelTaskReminders(currentTask.notificationId);
+					await taskService.updateNotificationId(id, null);
+				}
+			} else if (currentTask) {
+				// Unchecked back to pending: re-schedule reminder
+				const newNotificationId = await scheduleTaskReminder({
+					...currentTask,
+					status: "pending",
+				});
+				if (newNotificationId) {
+					await taskService.updateNotificationId(id, newNotificationId);
+					setAllTasks((prev) =>
+						prev.map((item) => (item.id === id ? { ...item, notificationId: newNotificationId } : item))
+					);
+				}
+			}
 		} catch (error) {
 			console.error("Error updating status:", error);
 		}
 	};
 
 	const handleDelete = async (id: string) => {
+		const taskToDelete = allTasks.find((item) => item?.id === id);
 		setAllTasks((prev) => prev.filter((item) => item?.id !== id));
+
 		try {
+			if (taskToDelete?.notificationId) {
+				await cancelTaskReminders(taskToDelete.notificationId);
+			}
 			await taskService.deleteTask(id);
 		} catch (error) {
 			console.error("Error deleting task:", error);

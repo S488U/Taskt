@@ -16,6 +16,13 @@
       "expo-router",
       "expo-font",
       "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#6366F1"
+        }
+      ],
       "expo-status-bar",
       [
         "expo-splash-screen",

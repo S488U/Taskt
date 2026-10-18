@@ -15,6 +15,7 @@ import AppText from "../../components/AppText";
 
 import { useTaskDraft } from "../../context/TaskDraftContext";
 import { taskService } from "../../db/taskService";
+import { scheduleTaskReminder } from "../../utils/notificationService";
 import type { TaskEntity } from "./task.types";
 
 const CreateTask = () => {
@@ -72,14 +73,20 @@ const CreateTask = () => {
 				kind: draft.pattern === "one-time" ? "one_time" : "recurring",
 				status: "pending",
 				dueDate: draft.pattern === "one-time" ? draft.date : null,
-				dueTime: draft.pattern === "one-time" ? draft.time : null,
+				dueTime: draft.time || null,
 				recurringMode: draft.pattern === "recurring" ? draft.recurringMode : null,
 				recurringDays: draft.pattern === "recurring" ? draft.recurringDays : [],
 				createdAt: now,
 				updatedAt: now,
 				completedAt: null,
 				timezone,
+				notificationId: null,
 			};
+
+			const notificationId = await scheduleTaskReminder(newTask);
+			if (notificationId) {
+				newTask.notificationId = notificationId;
+			}
 
 			await taskService.createTask(newTask);
 			resetDraft();
