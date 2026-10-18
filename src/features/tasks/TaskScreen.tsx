@@ -29,9 +29,6 @@ const TodoScreen = () => {
 
 			<Pressable onPress={() => router.push("/settings")}>
 				<Header title={greeter} customClass={greeterSize ? "text-2xl leading-7" : "text-4xl leading-[44px]"} />
-			</Pressable>
-
-			<Pressable onPress={() => router.push("/datepicker")}>
 				<Today />
 			</Pressable>
 

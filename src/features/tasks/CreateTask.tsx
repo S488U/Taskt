@@ -2,7 +2,7 @@ import { View, Pressable, Animated, Easing, Keyboard } from "react-native";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import type { TextInput } from "react-native";
+import type { TextInputInstance } from "react-native";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { Temporal } from "@js-temporal/polyfill";
@@ -19,7 +19,7 @@ import type { TaskEntity } from "./task.types";
 
 const CreateTask = () => {
 	const [patternWidth, setPatternWidth] = useState(0);
-	const descriptionInputRef = useRef<TextInput>(null);
+	const descriptionInputRef = useRef<TextInputInstance>(null);
 	const [validationErrors, setValidationErrors] = useState({
 		title: false,
 		oneTime: false,
