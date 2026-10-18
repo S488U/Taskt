@@ -11,18 +11,24 @@
       "tsconfigPaths": true
     },
     "plugins": [
+      "./plugins/withGradleTuning",
+      "./plugins/withApkName",
       "expo-router",
       "expo-font",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],

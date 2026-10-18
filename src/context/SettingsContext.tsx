@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { loadSettings, storeSettings } from "../utils/storageUtils";
 
 interface SettingsContextType {
@@ -24,13 +24,15 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 		initSettings();
 	}, []);
 
-	const setGreeterSize = async (val: boolean) => {
+	const setGreeterSize = useCallback(async (val: boolean) => {
 		setGreeterSizeState(val);
 		await storeSettings(SETTING_GREETER_SIZE, val);
-	};
+	}, []);
+
+	const contextValue = useMemo(() => ({ greeterSize, setGreeterSize }), [greeterSize, setGreeterSize]);
 
 	return (
-		<SettingsContext.Provider value={{ greeterSize, setGreeterSize }}>
+		<SettingsContext.Provider value={contextValue}>
 			{children}
 		</SettingsContext.Provider>
 	);

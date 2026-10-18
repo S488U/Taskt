@@ -1,12 +1,12 @@
 import { forwardRef } from "react";
-import { TextInput, type TextInputProps } from "react-native";
+import { TextInput, type TextInputInstance, type TextInputProps } from "react-native";
 
 type AppTextInputProps = TextInputProps & {
 	customClass? : string;
 	hasError? : boolean;
 }
 
-const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
+const AppTextInput = forwardRef<TextInputInstance, AppTextInputProps>(
 	(
 		{
 			customClass = "",
