@@ -15,7 +15,8 @@
 		"prebuild": "expo prebuild --clean --platform android",
 		"local": "cd android && ./gradlew assembleRelease",
 		"phone": "cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a",
-		"genymotion": "cd android && ./gradlew assembleRelease -PreactNativeArchitectures=x86_64"
+		"genymotion": "cd android && ./gradlew assembleRelease -PreactNativeArchitectures=x86_64",
+		"debug": "cd android && ./gradlew :app:assembleDebug -PreactNativeArchitectures=armeabi-v7a,arm64-v8a,x86,x86_64"
 	},
 	"type": "module",
 	"dependencies": {
