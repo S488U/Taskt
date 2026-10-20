@@ -27,8 +27,7 @@ const ProgressCard = ({ todoExtra }) => {
 			if (value !== previous) {
 				scheduleOnRN(setDisplayPercent, value);
 			}
-		},
-		[progressValue]
+		}
 	);
 
 	const cardAnimatedStyle = useAnimatedStyle(() => ({
@@ -37,20 +36,19 @@ const ProgressCard = ({ todoExtra }) => {
 	}));
 
 	return (
-		<Animated.View
-			style={cardAnimatedStyle}
-			className="mb-5 mt-3 w-full flex-row items-center justify-between rounded-3xl border border-secondary/20 bg-primary/10 p-4"
-		>
-			<View className="flex-col gap-y-1">
-				<Text className="font-interMedium text-lg text-primary">YOUR PROGRESS</Text>
-				{displayPercent !== 0 ? (
-					<Text className="font-interSBold text-xl">{displayPercent}% of tasks completed</Text>
-				): (
-					<Text className="font-interSBold text-xl">Do a task to get completed!</Text>
-				)}
-			</View>
-			<View>
-				<ProgressCircle progress={progress} completed={status} total={length} />
+		<Animated.View style={cardAnimatedStyle} className="mt-3 mb-5 w-full">
+			<View className="border-secondary/20 bg-primary/10 w-full flex-row items-center justify-between rounded-3xl border p-4">
+				<View className="flex-col gap-y-1">
+					<Text className="font-interMedium text-primary text-lg">YOUR PROGRESS</Text>
+					{displayPercent !== 0 ? (
+						<Text className="font-interSBold text-xl">{displayPercent}% of tasks completed</Text>
+					) : (
+						<Text className="font-interSBold text-xl">Do a task to get completed!</Text>
+					)}
+				</View>
+				<View>
+					<ProgressCircle progress={progress} completed={status} total={length} />
+				</View>
 			</View>
 		</Animated.View>
 	);

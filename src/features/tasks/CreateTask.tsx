@@ -217,12 +217,11 @@ const CreateTask = () => {
 				<View>
 					<Pressable
 						disabled={isAddDisabled}
-						className={`rounded-3xl border border-slate-400 ${
-							isAddDisabled ? "bg-slate-300" : "bg-primary"
-						}`}
+						style={{ backgroundColor: isAddDisabled ? "#CBD5E1" : "#4F46E5" }}
+						className="rounded-3xl py-3"
 						onPress={handleAddTask}
 					>
-						<AppText className="text-surface my-3 text-center text-xl">Add Task</AppText>
+						<AppText className="text-surface text-center text-xl">Add Task</AppText>
 					</Pressable>
 				</View>
 			</View>

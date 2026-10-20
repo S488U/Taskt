@@ -1,39 +1,37 @@
+import "../../global.css";
+import { useEffect } from "react";
+
 import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import { initDB } from "../db/migrations";
-import { migrate } from "drizzle-orm/expo-sqlite/migrator";
+import * as SplashScreen from "expo-splash-screen";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { db } from "../db";
 import migrations from "../../drizzle/migrations";
 
-// Styles
-import "../../global.css";
-import { useEffect } from "react";
 import { SettingsProvider } from "../context/SettingsContext";
 import { TaskDraftProvider } from "../context/TaskDraftContext";
 import { setupNotificationChannel, requestNotificationPermissions } from "../utils/notificationService";
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 // Root
 const RootLayout = () => {
-	const [fontsLoaded] = useFonts({
+	const [fontsLoaded, fontError] = useFonts({
 		InterRegular: require("../../assets/fonts/Inter-Regular.ttf"),
 		InterMedium: require("../../assets/fonts/Inter-Medium.ttf"),
 		InterSemiBold: require("../../assets/fonts/Inter-SemiBold.ttf"),
 		InterBold: require("../../assets/fonts/Inter-Bold.ttf"),
 	});
 
-	// Initialise Database & Notifications
-	useEffect(() => {
-		const initialiseApp = async () => {
-			try {
-				await migrate(db, migrations);
-				console.log("Database migrations completed successfully");
-			} catch (error) {
-				console.error("Error connecting to database:", error);
-			}
+	const { success: isDbReady, error: dbError } = useMigrations(db, migrations);
 
+	// Initialise Notifications
+	useEffect(() => {
+		const initialiseNotifications = async () => {
 			try {
 				await setupNotificationChannel();
 				await requestNotificationPermissions();
@@ -42,10 +40,29 @@ const RootLayout = () => {
 			}
 		};
 
-		initialiseApp();
+		initialiseNotifications();
 	}, []);
 
-	if (!fontsLoaded) {
+	// Log errors if they occur
+	useEffect(() => {
+		if (fontError) {
+			console.error("Font loading error:", fontError);
+		}
+		if (dbError) {
+			console.error("Database migration error:", dbError);
+		}
+	}, [fontError, dbError]);
+
+	// Hide splash screen once fonts and database are resolved
+	useEffect(() => {
+		if ((fontsLoaded || fontError) && (isDbReady || dbError)) {
+			SplashScreen.hideAsync().catch((err) => {
+				console.warn("Error hiding splash screen:", err);
+			});
+		}
+	}, [fontsLoaded, fontError, isDbReady, dbError]);
+
+	if ((!fontsLoaded && !fontError) || (!isDbReady && !dbError)) {
 		return null;
 	}
 	return (

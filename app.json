@@ -31,7 +31,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
