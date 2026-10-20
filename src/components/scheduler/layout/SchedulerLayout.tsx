@@ -1,13 +1,8 @@
 import { View, Pressable } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
-import { styled } from "nativewind";
 import { Ionicons } from "@expo/vector-icons";
 import AppText from "../../AppText";
-
-const StyledIcon = styled(Ionicons, {
-	className: "style",
-});
 
 interface SchedulerLayoutProps {
 	title: string;
@@ -24,7 +19,7 @@ const SchedulerLayout = ({ title, children, onConfirm }: SchedulerLayoutProps) =
 				<View className="w-full flex-row items-center">
 					<View className="absolute w-20 items-center">
 						<Pressable onPress={() => router.back()}>
-							<StyledIcon className="text-secondary" name="close" size={24} color="black" />
+							<Ionicons name="close" size={24} color="#64748B" />
 						</Pressable>
 					</View>
 

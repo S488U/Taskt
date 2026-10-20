@@ -51,7 +51,6 @@ export async function setupNotificationChannel(): Promise<void> {
 			importance: AndroidImportance.MAX,
 			vibrationPattern: [0, 250, 250, 250],
 			lightColor: "#6366F1",
-			sound: "default",
 			enableVibrate: true,
 		});
 		isChannelInitialized = true;
@@ -123,7 +122,6 @@ export async function scheduleTaskReminder(task: TaskEntity): Promise<string | n
 				content: {
 					title: task.title,
 					body: task.description || "Task reminder",
-					sound: "default",
 					data: { taskId: task.id },
 				},
 				trigger: {
@@ -153,7 +151,6 @@ export async function scheduleTaskReminder(task: TaskEntity): Promise<string | n
 					content: {
 						title: task.title,
 						body: task.description || "Recurring task reminder",
-						sound: "default",
 						data: { taskId: task.id },
 					},
 					trigger: {

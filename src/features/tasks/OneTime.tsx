@@ -1,7 +1,6 @@
 import { View, Pressable } from "react-native";
 import { useEffect, useMemo } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { styled } from "nativewind";
 import { router } from "expo-router";
 import { Temporal } from "@js-temporal/polyfill";
 
@@ -9,9 +8,8 @@ import SubTitle from "../../components/SubTitle";
 import AppText from "../../components/AppText";
 import { useTaskDraft } from "../../context/TaskDraftContext";
 
-styled(FontAwesome6, {
-	className: "style",
-});
+const COLOR_DANGER = "#EF4444";
+const COLOR_SECONDARY = "#64748B";
 
 const clockIcon = "clock";
 const calendarIcon = "calendar-days";
@@ -90,7 +88,7 @@ const OneTime = ({ onErrorChange }: OneTimeProps) => {
 							<FontAwesome6
 								name={calendarIcon}
 								size={16}
-								className={`${isPast ? "text-danger" : "text-secondary"}`}
+								color={isPast ? COLOR_DANGER : COLOR_SECONDARY}
 							/>
 							<AppText className={`text-base ${isPast ? "text-danger" : "text-secondary"} leading-5`}>
 								{formatDateString(draft.date)}
@@ -106,7 +104,7 @@ const OneTime = ({ onErrorChange }: OneTimeProps) => {
 							<FontAwesome6
 								name={clockIcon}
 								size={16}
-								className={`${isPast ? "text-danger" : "text-secondary"}`}
+								color={isPast ? COLOR_DANGER : COLOR_SECONDARY}
 							/>
 							<AppText
 								className={`text-base ${isPast ? "text-danger" : "text-secondary"} leading-5 uppercase`}

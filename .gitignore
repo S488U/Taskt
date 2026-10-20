@@ -25,3 +25,4 @@ android
 
 # Isolating the copy of gradle property file from the project root folder.
 gradle.properties 
+

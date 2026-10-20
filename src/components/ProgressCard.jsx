@@ -43,7 +43,7 @@ const ProgressCard = ({ todoExtra }) => {
 		>
 			<View className="flex-col gap-y-1">
 				<Text className="font-interMedium text-lg text-primary">YOUR PROGRESS</Text>
-				{displayPercent != 0 ? (
+				{displayPercent !== 0 ? (
 					<Text className="font-interSBold text-xl">{displayPercent}% of tasks completed</Text>
 				): (
 					<Text className="font-interSBold text-xl">Do a task to get completed!</Text>
