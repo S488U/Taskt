@@ -71,7 +71,7 @@ const ProgressCircle = ({ progress = 0, completed = 0, total = 0 }: ProgressCirc
 			</Svg>
 
 			{/* Dynamic text */}
-			<Animated.View style={labelAnimatedStyle} className="absolute">
+			<Animated.View style={[labelAnimatedStyle, { position: "absolute" }]}>
 				<Text className="font-interSBold text-primary">{total === 0 ? "0/0" : `${completed}/${total}`}</Text>
 			</Animated.View>
 		</View>
