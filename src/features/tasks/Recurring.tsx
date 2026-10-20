@@ -1,7 +1,6 @@
 import { View, Pressable } from "react-native";
 import { useState, useEffect, useMemo } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { styled } from "nativewind";
 import { router } from "expo-router";
 import { Temporal } from "@js-temporal/polyfill";
 
@@ -12,9 +11,8 @@ import { useTaskDraft } from "../../context/TaskDraftContext";
 import type { RecurringMode, Weekday } from "./task.types";
 import { DAY_LABELS, getPresetDays, hasFutureOccurrence } from "../../utils/scheduleUtils";
 
-styled(FontAwesome6, {
-	className: "style",
-});
+const COLOR_DANGER = "#EF4444";
+const COLOR_SECONDARY = "#64748B";
 
 const clockIcon = "clock";
 
@@ -130,7 +128,7 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 					<FontAwesome6
 						name={clockIcon}
 						size={16}
-						className={`${isPast ? "text-danger" : "text-secondary"}`}
+						color={isPast ? COLOR_DANGER : COLOR_SECONDARY}
 					/>
 					<AppText
 						className={`${isPast ? "text-danger" : "text-secondary"} font-interMedium text-center text-base uppercase`}

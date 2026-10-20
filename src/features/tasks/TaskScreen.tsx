@@ -9,15 +9,10 @@ import FloatingButton from "../../components/FloatingButton";
 
 // Icons
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { styled } from "nativewind";
 
 // custom hooks
 import useGreeter from "../../hooks/useGreeter";
 import { useSettings } from "../../context/SettingsContext";
-
-styled(FontAwesome6, {
-	className: "style",
-});
 
 const TodoScreen = () => {
 	const { greeter } = useGreeter();
@@ -35,7 +30,7 @@ const TodoScreen = () => {
 			<View className="flex-1">
 				<SavedTasks />
 				<FloatingButton
-					icon={<FontAwesome6 name="add" size={20} className="text-background" />}
+					icon={<FontAwesome6 name="add" size={20} color="#FFFFFF" />}
 					// onPress={() => setShowCreate(true)}
 					onPress={() => router.push("/create")}
 				/>
