@@ -1,15 +1,42 @@
-const useGreeter = (date = new Date()) => {
-	const hour: number = date.getHours(); // 0–23
+import { useState, useEffect } from "react";
+import { AppState } from "react-native";
+import { Temporal } from "@js-temporal/polyfill";
 
-	let greeter: string = "Good Night";
+const getGreeting = (): string => {
+	const hour = Temporal.Now.plainTimeISO().hour;
 
 	if (hour >= 5 && hour < 12) {
-		greeter = "Good Morning";
+		return "Good Morning";
 	} else if (hour >= 12 && hour < 18) {
-		greeter = "Good Afternoon";
+		return "Good Afternoon";
 	} else if (hour >= 18 && hour < 22) {
-		greeter = "Good Evening";
+		return "Good Evening";
 	}
+	return "Good Night";
+};
+
+const useGreeter = () => {
+	const [greeter, setGreeter] = useState<string>(getGreeting);
+
+	useEffect(() => {
+		const refresh = () => {
+			const current = getGreeting();
+			setGreeter((prev) => (prev === current ? prev : current));
+		};
+
+		const subscription = AppState.addEventListener("change", (state) => {
+			if (state === "active") {
+				refresh();
+			}
+		});
+
+		const interval = setInterval(refresh, 60000);
+
+		return () => {
+			subscription.remove();
+			clearInterval(interval);
+		};
+	}, []);
 
 	return { greeter };
 };

@@ -1,26 +1,38 @@
-import { View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, AppState } from "react-native";
 import AppText from "./AppText";
-import { useState, useEffect } from "react";
-
-// To fetch today
 import { today } from "../utils/dateTime";
 
 const Today = () => {
 	const [day, setDay] = useState(() => today());
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			setDay(today());
-		}, 5000);
+		const refresh = () => {
+			const current = today();
+			setDay((prev) => (prev === current ? prev : current));
+		};
 
-		return () => clearInterval(interval);
+		// Refresh when returning from background / waking phone
+		const subscription = AppState.addEventListener("change", (state) => {
+			if (state === "active") {
+				refresh();
+			}
+		});
+
+		// Low-frequency background check once per minute instead of every 5 seconds
+		const interval = setInterval(refresh, 60000);
+
+		return () => {
+			subscription.remove();
+			clearInterval(interval);
+		};
 	}, []);
 
 	return (
 		<View className="mb-1">
-			<AppText className="px-1 font-interMedium text-secondary ">{day}</AppText>
+			<AppText className="font-interMedium text-secondary px-1">{day}</AppText>
 		</View>
 	);
 };
 
-export default Today;
+export default React.memo(Today);
