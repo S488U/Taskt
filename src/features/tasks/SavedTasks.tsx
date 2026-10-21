@@ -13,7 +13,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 import { taskService } from "../../db/taskService";
 import type { TaskEntity, TaskStatus } from "./task.types";
-import { DAY_LABELS } from "../../utils/scheduleUtils";
+import { DAY_LABELS, isTaskCompletedForDate } from "../../utils/scheduleUtils";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
 import { useTaskDraft } from "../../context/TaskDraftContext";
 import { useSettings } from "../../context/SettingsContext";
@@ -58,6 +58,10 @@ const SavedTasks = () => {
 		}
 	}, []);
 
+	const isTaskDone = useCallback((task: TaskEntity) => {
+		return isTaskCompletedForDate(task);
+	}, []);
+
 	const dailyTasks = useMemo(() => {
 		return allTasks.filter(isForToday);
 	}, [allTasks, isForToday]);
@@ -66,49 +70,66 @@ const SavedTasks = () => {
 		const target = viewAll ? allTasks : dailyTasks;
 		return {
 			length: target.length,
-			status: target.filter((item) => item.status === "done").length,
+			status: target.filter(isTaskDone).length,
 		};
-	}, [viewAll, allTasks, dailyTasks]);
+	}, [viewAll, allTasks, dailyTasks, isTaskDone]);
 
 	const visibleTasks = useMemo(() => {
 		const baseTasks = viewAll ? allTasks : dailyTasks;
-		const filtered = hideCompletedTasks ? baseTasks.filter((item) => item.status !== "done") : baseTasks;
+		const filtered = hideCompletedTasks ? baseTasks.filter((item) => !isTaskDone(item)) : baseTasks;
 
 		return [...filtered].sort((a, b) => {
-			if (a.status === b.status) return 0;
-			return a.status === "done" ? 1 : -1;
+			const aDone = isTaskDone(a);
+			const bDone = isTaskDone(b);
+			if (aDone === bDone) return 0;
+			return aDone ? 1 : -1;
 		});
-	}, [allTasks, viewAll, dailyTasks, hideCompletedTasks]);
+	}, [allTasks, viewAll, dailyTasks, hideCompletedTasks, isTaskDone]);
 
 	const handleToggle = useCallback(
 		async (id: string, nextChecked: boolean) => {
 			triggerHaptic(hapticsEnabled, nextChecked ? "success" : "selection");
+			const nowStr = Temporal.Now.instant().toString();
 			const nextStatus: TaskStatus = nextChecked ? "done" : "pending";
 
 			let currentTask: TaskEntity | undefined;
 			setAllTasks((prev) => {
 				currentTask = prev.find((item) => item.id === id);
-				return prev.map((item) => (item.id === id ? { ...item, status: nextStatus } : item));
+				return prev.map((item) =>
+					item.id === id
+						? {
+								...item,
+								status: nextStatus,
+								completedAt: nextChecked ? nowStr : null,
+							}
+						: item
+				);
 			});
 
 			try {
 				await taskService.updateStatus(id, nextStatus);
 
-				if (nextChecked) {
-					if (currentTask?.notificationId) {
-						await cancelTaskReminders(currentTask.notificationId);
-						await taskService.updateNotificationId(id, null);
-					}
-				} else if (currentTask) {
-					const newNotificationId = await scheduleTaskReminder({
-						...currentTask,
-						status: "pending",
-					});
-					if (newNotificationId) {
-						await taskService.updateNotificationId(id, newNotificationId);
-						setAllTasks((prev) =>
-							prev.map((item) => (item.id === id ? { ...item, notificationId: newNotificationId } : item))
-						);
+				// Only cancel/reschedule notifications for ONE-TIME tasks.
+				// For recurring tasks, keep the repeating weekly alarm intact!
+				if (currentTask?.kind === "one_time") {
+					if (nextChecked) {
+						if (currentTask?.notificationId) {
+							await cancelTaskReminders(currentTask.notificationId);
+							await taskService.updateNotificationId(id, null);
+						}
+					} else if (currentTask) {
+						const newNotificationId = await scheduleTaskReminder({
+							...currentTask,
+							status: "pending",
+						});
+						if (newNotificationId) {
+							await taskService.updateNotificationId(id, newNotificationId);
+							setAllTasks((prev) =>
+								prev.map((item) =>
+									item.id === id ? { ...item, notificationId: newNotificationId } : item
+								)
+							);
+						}
 					}
 				}
 			} catch (error) {
@@ -152,9 +173,15 @@ const SavedTasks = () => {
 
 	const renderItem = useCallback(
 		({ item }: { item: TaskEntity }) => (
-			<Card item={item} onDelete={handleDelete} onToggle={handleToggle} onPress={handleEdit} />
+			<Card
+				item={item}
+				checked={isTaskDone(item)}
+				onDelete={handleDelete}
+				onToggle={handleToggle}
+				onPress={handleEdit}
+			/>
 		),
-		[handleDelete, handleToggle, handleEdit]
+		[handleDelete, handleToggle, handleEdit, isTaskDone]
 	);
 
 	// State 1: Brand New User (Zero tasks exist anywhere in the app)

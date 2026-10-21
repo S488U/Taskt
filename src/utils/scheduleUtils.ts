@@ -46,3 +46,28 @@ export const getTodaysDay = (): Weekday => {
 	const today = Temporal.Now.plainDateISO();
 	return DAY_LABELS[today.dayOfWeek % 7];
 };
+
+/**
+ * Determines whether a task is completed for a given target date.
+ * - One-time tasks: depends on task.status === "done"
+ * - Recurring tasks: completed if task.completedAt falls on targetDate in user's local timezone.
+ */
+export const isTaskCompletedForDate = (
+	task: { kind: "one_time" | "recurring"; status: string; completedAt?: string | null },
+	targetDate?: Temporal.PlainDate
+): boolean => {
+	if (task.kind === "one_time") {
+		return task.status === "done";
+	}
+	if (!task.completedAt) return false;
+
+	try {
+		const target = targetDate ?? Temporal.Now.plainDateISO();
+		const completedDate = Temporal.Instant.from(task.completedAt)
+			.toZonedDateTimeISO(Temporal.Now.timeZoneId())
+			.toPlainDate();
+		return Temporal.PlainDate.compare(completedDate, target) === 0;
+	} catch {
+		return false;
+	}
+};
