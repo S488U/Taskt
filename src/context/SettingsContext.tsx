@@ -8,11 +8,14 @@ interface SettingsContextType {
 	setShowProgressCard: (val: boolean) => void;
 	hapticsEnabled: boolean;
 	setHapticsEnabled: (val: boolean) => void;
+	hideCompletedTasks: boolean;
+	setHideCompletedTasks: (val: boolean) => void;
 }
 
 const SETTING_GREETER_SIZE = "greeter_size";
 const SETTING_SHOW_PROGRESS_CARD = "show_progress_card";
 const SETTING_HAPTICS = "haptics_enabled";
+const SETTING_HIDE_COMPLETED_TASKS = "hide_completed_tasks";
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
@@ -20,6 +23,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 	const [greeterSize, setGreeterSizeState] = useState<boolean>(false);
 	const [showProgressCard, setShowProgressCardState] = useState<boolean>(true);
 	const [hapticsEnabled, setHapticsEnabledState] = useState<boolean>(true);
+	const [hideCompletedTasks, setHideCompletedTasksState] = useState<boolean>(false);
 
 	useEffect(() => {
 		const initSettings = async () => {
@@ -36,6 +40,11 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			const savedHaptics = await loadSettings(SETTING_HAPTICS);
 			if (typeof savedHaptics === "boolean") {
 				setHapticsEnabledState(savedHaptics);
+			}
+
+			const savedHideCompleted = await loadSettings(SETTING_HIDE_COMPLETED_TASKS);
+			if (typeof savedHideCompleted === "boolean") {
+				setHideCompletedTasksState(savedHideCompleted);
 			}
 		};
 
@@ -57,6 +66,11 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 		await storeSettings(SETTING_HAPTICS, val);
 	}, []);
 
+	const setHideCompletedTasks = useCallback(async (val: boolean) => {
+		setHideCompletedTasksState(val);
+		await storeSettings(SETTING_HIDE_COMPLETED_TASKS, val);
+	}, []);
+
 	const contextValue = useMemo(
 		() => ({
 			greeterSize,
@@ -65,8 +79,19 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			setShowProgressCard,
 			hapticsEnabled,
 			setHapticsEnabled,
+			hideCompletedTasks,
+			setHideCompletedTasks,
 		}),
-		[greeterSize, setGreeterSize, showProgressCard, setShowProgressCard, hapticsEnabled, setHapticsEnabled]
+		[
+			greeterSize,
+			setGreeterSize,
+			showProgressCard,
+			setShowProgressCard,
+			hapticsEnabled,
+			setHapticsEnabled,
+			hideCompletedTasks,
+			setHideCompletedTasks,
+		]
 	);
 
 	return <SettingsContext.Provider value={contextValue}>{children}</SettingsContext.Provider>;

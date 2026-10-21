@@ -23,7 +23,7 @@ const SavedTasks = () => {
 	const [allTasks, setAllTasks] = useState<TaskEntity[]>([]);
 	const [viewAll, setViewAll] = useState(false);
 	const { loadDraft } = useTaskDraft();
-	const { showProgressCard, hapticsEnabled } = useSettings();
+	const { showProgressCard, hapticsEnabled, hideCompletedTasks } = useSettings();
 
 	const loadTasks = async () => {
 		try {
@@ -58,16 +58,27 @@ const SavedTasks = () => {
 		}
 	}, []);
 
-	const visibleTasks = useMemo(() => {
-		return viewAll ? allTasks : allTasks.filter(isForToday);
-	}, [allTasks, viewAll, isForToday]);
+	const dailyTasks = useMemo(() => {
+		return allTasks.filter(isForToday);
+	}, [allTasks, isForToday]);
 
 	const todoExtra = useMemo(() => {
+		const target = viewAll ? allTasks : dailyTasks;
 		return {
-			length: visibleTasks.length,
-			status: visibleTasks.filter((item) => item.status === "done").length,
+			length: target.length,
+			status: target.filter((item) => item.status === "done").length,
 		};
-	}, [visibleTasks]);
+	}, [viewAll, allTasks, dailyTasks]);
+
+	const visibleTasks = useMemo(() => {
+		const baseTasks = viewAll ? allTasks : dailyTasks;
+		const filtered = hideCompletedTasks ? baseTasks.filter((item) => item.status !== "done") : baseTasks;
+
+		return [...filtered].sort((a, b) => {
+			if (a.status === b.status) return 0;
+			return a.status === "done" ? 1 : -1;
+		});
+	}, [allTasks, viewAll, dailyTasks, hideCompletedTasks]);
 
 	const handleToggle = useCallback(
 		async (id: string, nextChecked: boolean) => {

@@ -12,8 +12,16 @@ import { taskService } from "../../db/taskService";
 import { triggerHaptic } from "../../utils/haptics";
 
 const SettingsPage = () => {
-	const { greeterSize, setGreeterSize, showProgressCard, setShowProgressCard, hapticsEnabled, setHapticsEnabled } =
-		useSettings();
+	const {
+		greeterSize,
+		setGreeterSize,
+		showProgressCard,
+		setShowProgressCard,
+		hapticsEnabled,
+		setHapticsEnabled,
+		hideCompletedTasks,
+		setHideCompletedTasks,
+	} = useSettings();
 
 	const [showClearModal, setShowClearModal] = useState(false);
 	const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -41,11 +49,10 @@ const SettingsPage = () => {
 	const handleClearAll = async () => {
 		try {
 			setIsClearing(true);
-			triggerHaptic(hapticsEnabled);
+			triggerHaptic(hapticsEnabled, "warning");
 			await cancelAllReminders();
 			await taskService.clearAllTasks();
 			setShowClearModal(false);
-			Alert.alert("Cleared", "All tasks and active reminders have been removed.");
 		} catch (error) {
 			console.error("Error clearing tasks:", error);
 		} finally {
@@ -89,7 +96,7 @@ const SettingsPage = () => {
 						</View>
 
 						{/* Show Progress Card */}
-						<View className="flex-row items-center justify-between p-4">
+						<View className="border-border flex-row items-center justify-between border-b p-4">
 							<View className="flex-1 pr-3">
 								<AppText className="font-interMedium text-text text-base">Show Progress Card</AppText>
 								<AppText className="text-secondary font-inter text-xs">
@@ -101,6 +108,23 @@ const SettingsPage = () => {
 								onValueChange={(val) => {
 									triggerHaptic(hapticsEnabled);
 									setShowProgressCard(val);
+								}}
+							/>
+						</View>
+
+						{/* Hide Completed Tasks */}
+						<View className="flex-row items-center justify-between p-4">
+							<View className="flex-1 pr-3">
+								<AppText className="font-interMedium text-text text-base">Hide Completed Tasks</AppText>
+								<AppText className="text-secondary font-inter text-xs">
+									Hide finished tasks instead of fading and moving them to the bottom
+								</AppText>
+							</View>
+							<ToggleSwitch
+								value={hideCompletedTasks}
+								onValueChange={(val) => {
+									triggerHaptic(hapticsEnabled, "selection");
+									setHideCompletedTasks(val);
 								}}
 							/>
 						</View>
