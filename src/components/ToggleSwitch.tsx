@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Animated, Pressable } from "react-native";
 
 interface ToggleSwitchProps {
@@ -12,7 +12,7 @@ const ToggleSwitch = ({ value, onValueChange, disabled = false }: ToggleSwitchPr
 	const [internalValue, setInternalValue] = useState(false);
 	const active = isControlled ? value : internalValue;
 
-	const animValue = useRef(new Animated.Value(active ? 1 : 0)).current;
+	const [animValue] = useState(() => new Animated.Value(active ? 1 : 0));
 
 	useEffect(() => {
 		Animated.spring(animValue, {

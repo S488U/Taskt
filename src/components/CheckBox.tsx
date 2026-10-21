@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, View, Animated } from "react-native";
 
 interface checkBoxProps {
@@ -7,7 +7,7 @@ interface checkBoxProps {
 }
 
 const CheckBox = ({ value, onChange }: checkBoxProps) => {
-	const scaleAnim = useRef(new Animated.Value(value ? 1 : 0)).current;
+	const [scaleAnim] = useState(() => new Animated.Value(value ? 1 : 0));
 
 	useEffect(() => {
 		Animated.spring(scaleAnim, {
@@ -24,12 +24,12 @@ const CheckBox = ({ value, onChange }: checkBoxProps) => {
 	return (
 		<Pressable onPress={toggleButton} className="items-center justify-center">
 			<View className="h-14 w-10 items-center justify-center">
-				<View className="h-7 w-7 items-center justify-center rounded-full border-2 border-primary">
+				<View className="border-primary h-7 w-7 items-center justify-center rounded-full border-2">
 					<Animated.View
 						style={{
 							transform: [{ scale: scaleAnim }],
 						}}
-						className="h-4 w-4 rounded-full bg-primary"
+						className="bg-primary h-4 w-4 rounded-full"
 					/>
 				</View>
 			</View>

@@ -59,16 +59,29 @@ const RightAction = ({ progress, dragX, cardWidth }) => {
 	return (
 		<View style={{ width: cardWidth }} className="items-end">
 			<Animated.View
-				style={panelAnimatedStyle}
-				className="h-full items-center justify-center rounded-2xl bg-danger"
+				style={[
+					panelAnimatedStyle,
+					{
+						overflow: "hidden",
+						borderRadius: 16,
+						backgroundColor: "#EF4444",
+					},
+				]}
 			>
-				<View className="min-w-20 items-center justify-center gap-1.5">
-					<AnimatedMaterialIcons name="delete-outline" size={28} color="#FFF7ED" style={binAnimatedStyle} />
-					<Animated.View style={labelAnimatedStyle}>
-						<AppText className="font-interMedium text-xs uppercase tracking-wider text-surface">
-							Delete
-						</AppText>
-					</Animated.View>
+				<View className="h-full w-full items-center justify-center">
+					<View className="min-w-20 items-center justify-center gap-1.5">
+						<AnimatedMaterialIcons
+							name="delete-outline"
+							size={28}
+							color="#FFF7ED"
+							style={binAnimatedStyle}
+						/>
+						<Animated.View style={labelAnimatedStyle}>
+							<AppText className="font-interMedium text-surface text-xs tracking-wider uppercase">
+								Delete
+							</AppText>
+						</Animated.View>
+					</View>
 				</View>
 			</Animated.View>
 		</View>
@@ -76,8 +89,8 @@ const RightAction = ({ progress, dragX, cardWidth }) => {
 };
 
 const Card = ({ item, onDelete, onToggle }) => {
-	if (!item) return null;
 	const [cardWidth, setCardWidth] = useState(0);
+	if (!item) return null;
 
 	const id = item.id;
 	const checked = item.status === "done" || item.status === true;
@@ -112,13 +125,13 @@ const Card = ({ item, onDelete, onToggle }) => {
 			<View
 				onLayout={(e) => setCardWidth(e.nativeEvent.layout.width)}
 				style={cardShadow}
-				className={` ${strikeBg} mb-2 h-max w-full flex-row gap-2 rounded-2xl  border-border p-3 shadow-lg`}
+				className={` ${strikeBg} border-border mb-2 h-max w-full flex-row gap-2 rounded-2xl p-3 shadow-lg`}
 			>
 				<CheckBox value={checked} onChange={handleToggle} />
-				<View className={` ${strikeBg} flex-1 `}>
+				<View className={` ${strikeBg} flex-1`}>
 					<View className="flex flex-row items-center">
 						<AppText
-							className={`${strikeThroughText} flex-1 font-interMedium text-lg capitalize text-text`}
+							className={`${strikeThroughText} font-interMedium text-text flex-1 text-lg capitalize`}
 						>
 							{newTitle}
 						</AppText>
@@ -126,7 +139,7 @@ const Card = ({ item, onDelete, onToggle }) => {
 					</View>
 
 					{desc && (
-						<AppText className={` ${strikeSubText} h-fit text-secondary`}>
+						<AppText className={` ${strikeSubText} text-secondary h-fit`}>
 							{desc.length > 95 ? desc.substring(0, 95) + "..." : desc}
 						</AppText>
 					)}
