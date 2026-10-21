@@ -30,7 +30,7 @@ const CreateTask = () => {
 	const { draft, updateDraft, resetDraft } = useTaskDraft();
 
 	const placeHolderTextColor = "#64748B";
-	const patternAnim = useRef(new Animated.Value(0)).current;
+	const [patternAnim] = useState(() => new Animated.Value(0));
 
 	useEffect(() => {
 		Animated.timing(patternAnim, {
