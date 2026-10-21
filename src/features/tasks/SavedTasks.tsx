@@ -1,6 +1,6 @@
 import { FlatList, View } from "react-native";
 import { useCallback, useMemo, useState } from "react";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Temporal } from "@js-temporal/polyfill";
 
 // components
@@ -12,10 +12,12 @@ import { taskService } from "../../db/taskService";
 import type { TaskEntity, TaskStatus } from "./task.types";
 import { DAY_LABELS } from "../../utils/scheduleUtils";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
+import { useTaskDraft } from "../../context/TaskDraftContext";
 
 const SavedTasks = () => {
 	const [allTasks, setAllTasks] = useState<TaskEntity[]>([]);
 	const [viewAll, setViewAll] = useState(false);
+	const { loadDraft } = useTaskDraft();
 
 	const loadTasks = async () => {
 		try {
@@ -117,6 +119,11 @@ const SavedTasks = () => {
 		}
 	};
 
+	const handleEdit = (task: TaskEntity) => {
+		loadDraft(task);
+		router.push({ pathname: "/edit", params: { id: task.id } });
+	};
+
 	return (
 		<>
 			<ProgressCard todoExtra={todoExtra} />
@@ -137,7 +144,9 @@ const SavedTasks = () => {
 					className="flex-1"
 					data={visibleTasks}
 					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => <Card item={item} onDelete={handleDelete} onToggle={handleToggle} />}
+					renderItem={({ item }) => (
+						<Card item={item} onDelete={handleDelete} onToggle={handleToggle} onPress={handleEdit} />
+					)}
 					contentContainerClassName="flex flex-col gap-2 pb-12 px-0.5"
 					showsVerticalScrollIndicator={false}
 					removeClippedSubviews={false}
