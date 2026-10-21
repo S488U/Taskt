@@ -51,4 +51,8 @@ export const taskService = {
 	deleteTask: async (id: string) => {
 		return await db.delete(taskTable).where(eq(taskTable.id, id));
 	},
+
+	clearAllTasks: async () => {
+		return await db.delete(taskTable);
+	},
 };
