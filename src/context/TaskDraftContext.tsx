@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { Temporal } from "@js-temporal/polyfill";
 import type { TaskDraft, TaskEntity } from "../features/tasks/task.types";
 
@@ -27,11 +27,16 @@ const TaskDraftContext = createContext<TaskDraftContextValue | null>(null);
 
 export const TaskDraftProvider = ({ children }: { children: React.ReactNode }) => {
 	const [draft, setDraft] = useState<TaskDraft>(getInitialDraft);
-	const updateDraft = (updates: Partial<TaskDraft>) => {
+
+	const updateDraft = useCallback((updates: Partial<TaskDraft>) => {
 		setDraft((prev) => ({ ...prev, ...updates }));
-	};
-	const resetDraft = () => setDraft(getInitialDraft());
-	const loadDraft = (task: TaskEntity) => {
+	}, []);
+
+	const resetDraft = useCallback(() => {
+		setDraft(getInitialDraft());
+	}, []);
+
+	const loadDraft = useCallback((task: TaskEntity) => {
 		const future = Temporal.Now.plainDateTimeISO().add({ hours: 1 });
 		setDraft({
 			title: task.title,
@@ -42,12 +47,14 @@ export const TaskDraftProvider = ({ children }: { children: React.ReactNode }) =
 			recurringMode: task.recurringMode || "today",
 			recurringDays: task.recurringDays || [],
 		});
-	};
-	return (
-		<TaskDraftContext.Provider value={{ draft, updateDraft, resetDraft, loadDraft }}>
-			{children}
-		</TaskDraftContext.Provider>
+	}, []);
+
+	const value = useMemo(
+		() => ({ draft, updateDraft, resetDraft, loadDraft }),
+		[draft, updateDraft, resetDraft, loadDraft]
 	);
+
+	return <TaskDraftContext.Provider value={value}>{children}</TaskDraftContext.Provider>;
 };
 
 export const useTaskDraft = () => {

@@ -221,7 +221,7 @@ const SavedTasks = () => {
 				data={visibleTasks}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
-				contentContainerClassName="flex flex-col gap-2 pb-12 px-0.5"
+				contentContainerClassName="flex flex-col gap-2 pb-12 px-1 pt-1"
 				showsVerticalScrollIndicator={false}
 				removeClippedSubviews={true}
 				maxToRenderPerBatch={8}

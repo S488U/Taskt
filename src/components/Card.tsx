@@ -129,6 +129,8 @@ const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
 			key={item.id}
 			overshootRight={false}
 			rightThreshold={cardWidth > 0 ? cardWidth * 0.75 : 200}
+			containerStyle={{ overflow: "visible" }}
+			childrenContainerStyle={{ overflow: "visible" }}
 			onSwipeableOpen={() => {
 				onDelete?.(id);
 			}}
@@ -138,10 +140,8 @@ const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
 		>
 			<View
 				onLayout={onLayout}
-				style={cardShadow}
-				className={`${strikeBg} border-border mb-2 h-max w-full flex-row gap-2 rounded-2xl p-3 shadow-lg ${
-					checked ? "opacity-60" : ""
-				}`}
+				style={checked ? undefined : cardShadow}
+				className={`${strikeBg} border-border mb-2 h-max w-full flex-row gap-2 rounded-2xl p-3`}
 			>
 				<CheckBox value={checked} onChange={handleToggle} />
 				<Pressable onPress={() => onPress?.(item)} className={`${strikeBg} flex-1`}>

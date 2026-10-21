@@ -400,7 +400,7 @@ const CalendarScreen = () => {
 					data={tasksForSelectedDate}
 					keyExtractor={keyExtractor}
 					renderItem={renderItem}
-					contentContainerClassName="flex flex-col gap-2 pb-6 px-0.5"
+					contentContainerClassName="flex flex-col gap-2 pb-6 px-1 pt-1"
 					showsVerticalScrollIndicator={false}
 					removeClippedSubviews={true}
 					maxToRenderPerBatch={8}

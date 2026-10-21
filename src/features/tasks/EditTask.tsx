@@ -33,9 +33,13 @@ const EditTask = () => {
 	const placeHolderTextColor = "#64748B";
 	const [patternAnim] = useState(() => new Animated.Value(draft.pattern === "one-time" ? 0 : 1));
 
+	const loadedIdRef = useRef<string | null>(null);
+
 	// Load existing task from db if not already loaded into draft
 	useEffect(() => {
-		if (!id) return;
+		if (!id || loadedIdRef.current === id) return;
+		loadedIdRef.current = id;
+
 		const loadTaskFromDb = async () => {
 			try {
 				const existing = await taskService.getTaskById(id);
