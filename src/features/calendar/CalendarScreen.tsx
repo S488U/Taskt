@@ -123,15 +123,20 @@ const CalendarScreen = () => {
 		return set;
 	}, [allTasks, calendarDates, isTaskOnDate]);
 
-	// Tasks for the selected date, filtered by kind
+	// Tasks for the selected date, filtered by kind and sorted (pending first, completed last)
 	const tasksForSelectedDate = useMemo(() => {
-		return allTasks.filter((task) => {
+		const filtered = allTasks.filter((task) => {
 			const matchesDate = isTaskOnDate(task, selectedDate);
 			if (!matchesDate) return false;
 
 			if (activeFilter === "recurring") return task.kind === "recurring";
 			if (activeFilter === "one_time") return task.kind === "one_time";
 			return true;
+		});
+
+		return [...filtered].sort((a, b) => {
+			if (a.status === b.status) return 0;
+			return a.status === "done" ? 1 : -1;
 		});
 	}, [allTasks, selectedDate, activeFilter, isTaskOnDate]);
 
