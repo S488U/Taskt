@@ -14,12 +14,13 @@ import { DAY_LABELS } from "../../utils/scheduleUtils";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
 import { useTaskDraft } from "../../context/TaskDraftContext";
 import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 
 const SavedTasks = () => {
 	const [allTasks, setAllTasks] = useState<TaskEntity[]>([]);
 	const [viewAll, setViewAll] = useState(false);
 	const { loadDraft } = useTaskDraft();
-	const { showProgressCard } = useSettings();
+	const { showProgressCard, hapticsEnabled } = useSettings();
 
 	const loadTasks = async () => {
 		try {
@@ -66,6 +67,7 @@ const SavedTasks = () => {
 	}, [visibleTasks]);
 
 	const handleToggle = async (id: string, nextChecked: boolean) => {
+		triggerHaptic(hapticsEnabled, nextChecked ? "success" : "selection");
 		const nextStatus: TaskStatus = nextChecked ? "done" : "pending";
 		const currentTask = allTasks.find((item) => item.id === id);
 
@@ -108,6 +110,7 @@ const SavedTasks = () => {
 	};
 
 	const handleDelete = async (id: string) => {
+		triggerHaptic(hapticsEnabled, "warning");
 		const taskToDelete = allTasks.find((item) => item?.id === id);
 		setAllTasks((prev) => prev.filter((item) => item?.id !== id));
 
@@ -122,6 +125,7 @@ const SavedTasks = () => {
 	};
 
 	const handleEdit = (task: TaskEntity) => {
+		triggerHaptic(hapticsEnabled, "selection");
 		loadDraft(task);
 		router.push({ pathname: "/edit", params: { id: task.id } });
 	};
@@ -135,7 +139,10 @@ const SavedTasks = () => {
 					{viewAll ? "all tasks" : "daily tasks"}
 				</AppText>
 				<AppText
-					onPress={() => setViewAll((prev) => !prev)}
+					onPress={() => {
+						triggerHaptic(hapticsEnabled, "selection");
+						setViewAll((prev) => !prev);
+					}}
 					className="font-interSBold text-primary text-base capitalize"
 				>
 					{viewAll ? "View Today" : "View All"}

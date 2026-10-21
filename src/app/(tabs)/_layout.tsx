@@ -4,6 +4,8 @@ import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 
 type TabIconProps = {
 	name: keyof typeof Ionicons.glyphMap;
@@ -58,6 +60,7 @@ const AnimatedTabIcon = ({ name, focusedName, focused }: TabIconProps) => {
 
 const TabLayout = () => {
 	const insets = useSafeAreaInsets();
+	const { hapticsEnabled } = useSettings();
 
 	return (
 		<Tabs
@@ -67,9 +70,13 @@ const TabLayout = () => {
 				tabBarInactiveTintColor: "#64748B",
 				tabBarActiveBackgroundColor: "transparent",
 				tabBarInactiveBackgroundColor: "transparent",
-				tabBarButton: ({ android_ripple, ref, ...props }) => (
+				tabBarButton: ({ android_ripple, ref, onPress, ...props }) => (
 					<Pressable
 						{...props}
+						onPress={(e) => {
+							triggerHaptic(hapticsEnabled, "selection");
+							onPress?.(e);
+						}}
 						style={[props.style, { backgroundColor: "transparent" }]}
 					/>
 				),

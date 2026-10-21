@@ -7,6 +7,8 @@ import { Temporal } from "@js-temporal/polyfill";
 import SubTitle from "../../components/SubTitle";
 import AppText from "../../components/AppText";
 import { useTaskDraft } from "../../context/TaskDraftContext";
+import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 
 const COLOR_DANGER = "#EF4444";
 const COLOR_SECONDARY = "#64748B";
@@ -48,6 +50,7 @@ type OneTimeProps = {
 
 const OneTime = ({ onErrorChange }: OneTimeProps) => {
 	const { draft } = useTaskDraft();
+	const { hapticsEnabled } = useSettings();
 
 	const isPast = useMemo(() => {
 		try {
@@ -81,7 +84,10 @@ const OneTime = ({ onErrorChange }: OneTimeProps) => {
 				<View className="flex-row gap-3">
 					<Pressable
 						className={`flex-1 border ${isPast ? "border-danger" : "border-border"} bg-surface rounded-2xl px-4 py-3`}
-						onPress={() => router.push("/datepicker")}
+						onPress={() => {
+							triggerHaptic(hapticsEnabled, "selection");
+							router.push("/datepicker");
+						}}
 					>
 						<AppText className={`text-xs ${isPast ? "text-danger" : "text-secondary"}`}>Date</AppText>
 						<View className="mt-1 flex-row items-center gap-2">
@@ -97,7 +103,10 @@ const OneTime = ({ onErrorChange }: OneTimeProps) => {
 					</Pressable>
 					<Pressable
 						className={`flex-1 border ${isPast ? "border-danger" : "border-border"} bg-surface rounded-2xl px-4 py-3`}
-						onPress={() => router.push("/timepicker")}
+						onPress={() => {
+							triggerHaptic(hapticsEnabled, "selection");
+							router.push("/timepicker");
+						}}
 					>
 						<AppText className={`text-xs ${isPast ? "text-danger" : "text-secondary"}`}>Time</AppText>
 						<View className="mt-1 flex-row items-center gap-2">

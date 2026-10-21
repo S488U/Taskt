@@ -15,6 +15,8 @@ import { DAY_LABELS } from "../../utils/scheduleUtils";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
 import { getToday, getCalendarDates, formatSelectedDate } from "../../utils/temporal/datePicker";
 import { useTaskDraft } from "../../context/TaskDraftContext";
+import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 
 const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const CELL_WIDTH_PERCENT = `${100 / 7}%`;
@@ -39,6 +41,7 @@ const CalendarScreen = () => {
 	);
 	const [activeFilter, setActiveFilter] = useState<FilterType>("all");
 	const { loadDraft } = useTaskDraft();
+	const { hapticsEnabled } = useSettings();
 
 	const loadTasks = async () => {
 		try {
@@ -57,26 +60,30 @@ const CalendarScreen = () => {
 
 	// Navigation
 	const goToPreviousMonth = useCallback(() => {
+		triggerHaptic(hapticsEnabled, "selection");
 		setDisplayedMonth((current) => current.subtract({ months: 1 }));
-	}, []);
+	}, [hapticsEnabled]);
 
 	const goToNextMonth = useCallback(() => {
+		triggerHaptic(hapticsEnabled, "selection");
 		setDisplayedMonth((current) => current.add({ months: 1 }));
-	}, []);
+	}, [hapticsEnabled]);
 
 	const goToToday = useCallback(() => {
+		triggerHaptic(hapticsEnabled, "selection");
 		setSelectedDate(today);
 		setDisplayedMonth(Temporal.PlainYearMonth.from({ year: today.year, month: today.month }));
-	}, [today]);
+	}, [today, hapticsEnabled]);
 
 	const handleDatePress = useCallback(
 		(date: Temporal.PlainDate) => {
+			triggerHaptic(hapticsEnabled, "selection");
 			setSelectedDate(date);
 			if (date.year !== displayedMonth.year || date.month !== displayedMonth.month) {
 				setDisplayedMonth(Temporal.PlainYearMonth.from({ year: date.year, month: date.month }));
 			}
 		},
-		[displayedMonth]
+		[displayedMonth, hapticsEnabled]
 	);
 
 	// Calendar Grid Dates
@@ -130,6 +137,7 @@ const CalendarScreen = () => {
 
 	// Task actions (matching SavedTasks.tsx behavior)
 	const handleToggle = async (id: string, nextChecked: boolean) => {
+		triggerHaptic(hapticsEnabled, nextChecked ? "success" : "selection");
 		const nextStatus: TaskStatus = nextChecked ? "done" : "pending";
 		const currentTask = allTasks.find((item) => item.id === id);
 
@@ -161,6 +169,7 @@ const CalendarScreen = () => {
 	};
 
 	const handleDelete = async (id: string) => {
+		triggerHaptic(hapticsEnabled, "warning");
 		const taskToDelete = allTasks.find((item) => item?.id === id);
 		setAllTasks((prev) => prev.filter((item) => item?.id !== id));
 
@@ -175,6 +184,7 @@ const CalendarScreen = () => {
 	};
 
 	const handleEdit = (task: TaskEntity) => {
+		triggerHaptic(hapticsEnabled, "selection");
 		loadDraft(task);
 		router.push({ pathname: "/edit", params: { id: task.id } });
 	};
@@ -195,7 +205,10 @@ const CalendarScreen = () => {
 			{/* Filter Chips */}
 			<View className="flex-row gap-2 pb-3">
 				<Pressable
-					onPress={() => setActiveFilter("all")}
+					onPress={() => {
+						triggerHaptic(hapticsEnabled, "selection");
+						setActiveFilter("all");
+					}}
 					className={`rounded-full px-4 py-2 ${
 						activeFilter === "all" ? "bg-primary" : "border-border bg-surface border"
 					}`}
@@ -210,7 +223,10 @@ const CalendarScreen = () => {
 				</Pressable>
 
 				<Pressable
-					onPress={() => setActiveFilter("recurring")}
+					onPress={() => {
+						triggerHaptic(hapticsEnabled, "selection");
+						setActiveFilter("recurring");
+					}}
 					className={`rounded-full px-4 py-2 ${
 						activeFilter === "recurring" ? "bg-primary" : "border-border bg-surface border"
 					}`}
@@ -225,7 +241,10 @@ const CalendarScreen = () => {
 				</Pressable>
 
 				<Pressable
-					onPress={() => setActiveFilter("one_time")}
+					onPress={() => {
+						triggerHaptic(hapticsEnabled, "selection");
+						setActiveFilter("one_time");
+					}}
 					className={`rounded-full px-4 py-2 ${
 						activeFilter === "one_time" ? "bg-primary" : "border-border bg-surface border"
 					}`}

@@ -14,9 +14,12 @@ import AppText from "../../components/AppText";
 import { useTaskDraft } from "../../context/TaskDraftContext";
 import { taskService } from "../../db/taskService";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
+import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 import type { TaskEntity } from "./task.types";
 
 const EditTask = () => {
+	const { hapticsEnabled } = useSettings();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const [patternWidth, setPatternWidth] = useState(0);
 	const descriptionInputRef = useRef<TextInputInstance>(null);
@@ -115,6 +118,7 @@ const EditTask = () => {
 			}
 
 			await taskService.updateTask(id, updatedData);
+			triggerHaptic(hapticsEnabled, "success");
 			resetDraft();
 			router.back();
 		} catch (error) {
@@ -123,6 +127,7 @@ const EditTask = () => {
 	};
 
 	const handleCancel = () => {
+		triggerHaptic(hapticsEnabled, "impact");
 		resetDraft();
 		router.back();
 	};
@@ -209,7 +214,10 @@ const EditTask = () => {
 								}}
 							/>
 							<Pressable
-								onPress={() => updateDraft({ pattern: "one-time" })}
+								onPress={() => {
+									triggerHaptic(hapticsEnabled, "selection");
+									updateDraft({ pattern: "one-time" });
+								}}
 								className="flex-1 rounded-xl"
 							>
 								<AppText
@@ -221,7 +229,10 @@ const EditTask = () => {
 								</AppText>
 							</Pressable>
 							<Pressable
-								onPress={() => updateDraft({ pattern: "recurring" })}
+								onPress={() => {
+									triggerHaptic(hapticsEnabled, "selection");
+									updateDraft({ pattern: "recurring" });
+								}}
 								className="flex-1 rounded-xl"
 							>
 								<AppText

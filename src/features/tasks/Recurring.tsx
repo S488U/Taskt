@@ -7,6 +7,8 @@ import { Temporal } from "@js-temporal/polyfill";
 import SubTitle from "../../components/SubTitle";
 import AppText from "../../components/AppText";
 import { useTaskDraft } from "../../context/TaskDraftContext";
+import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 
 import type { RecurringMode, Weekday } from "./task.types";
 import { DAY_LABELS, getPresetDays, hasFutureOccurrence } from "../../utils/scheduleUtils";
@@ -36,6 +38,7 @@ type RecurringProps = {
 
 const Recurring = ({ onErrorChange }: RecurringProps) => {
 	const { draft, updateDraft } = useTaskDraft();
+	const { hapticsEnabled } = useSettings();
 	const [hasInteracted, setHasInteracted] = useState(false);
 
 	const isPast = useMemo(() => {
@@ -54,6 +57,7 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 	}, [isPast, onErrorChange]);
 
 	const toggleDay = (day: Weekday) => {
+		triggerHaptic(hapticsEnabled, "selection");
 		setHasInteracted(true);
 		const currentDays = draft.recurringDays || [];
 		const days = currentDays.includes(day)
@@ -85,6 +89,7 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 						key={item}
 						className={`flex-1 ${draft.recurringMode === item ? "bg-primary" : "bg-surface"} border-border rounded-xl border`}
 						onPress={() => {
+							triggerHaptic(hapticsEnabled, "selection");
 							setHasInteracted(true);
 							updateDraft({
 								recurringMode: item,
@@ -122,7 +127,10 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 			<View>
 				<SubTitle title="Time" />
 				<Pressable
-					onPress={() => router.push("/timepicker")}
+					onPress={() => {
+						triggerHaptic(hapticsEnabled, "selection");
+						router.push("/timepicker");
+					}}
 					className={`flex-row items-center justify-center gap-2 border ${isPast ? "border-danger" : "border-border"} bg-surface rounded-xl px-4 py-3`}
 				>
 					<FontAwesome6
