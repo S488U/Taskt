@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View } from "react-native";
+import { View, Pressable } from "react-native";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -65,6 +65,14 @@ const TabLayout = () => {
 				headerShown: false,
 				tabBarActiveTintColor: "#0F172A",
 				tabBarInactiveTintColor: "#64748B",
+				tabBarActiveBackgroundColor: "transparent",
+				tabBarInactiveBackgroundColor: "transparent",
+				tabBarButton: ({ android_ripple, ref, ...props }) => (
+					<Pressable
+						{...props}
+						style={[props.style, { backgroundColor: "transparent" }]}
+					/>
+				),
 				tabBarStyle: {
 					backgroundColor: "#FFFFFF",
 					borderTopColor: "#E2E8F0",
@@ -72,6 +80,9 @@ const TabLayout = () => {
 					height: 66 + (insets.bottom > 0 ? insets.bottom : 8),
 					paddingTop: 6,
 					paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
+				},
+				tabBarItemStyle: {
+					backgroundColor: "transparent",
 				},
 				tabBarLabelStyle: {
 					fontFamily: "InterSemiBold",
