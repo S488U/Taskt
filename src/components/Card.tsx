@@ -67,8 +67,12 @@ const RightAction: React.FC<RightActionProps> = ({ progress, dragX, cardWidth })
 					panelAnimatedStyle,
 					{
 						overflow: "hidden",
-						borderRadius: 16,
+						borderTopRightRadius: 16,
+						borderBottomRightRadius: 16,
+						borderTopLeftRadius: 0,
+						borderBottomLeftRadius: 0,
 						backgroundColor: "#EF4444",
+						height: "100%",
 					},
 				]}
 			>
@@ -129,7 +133,7 @@ const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
 			key={item.id}
 			overshootRight={false}
 			rightThreshold={cardWidth > 0 ? cardWidth * 0.75 : 200}
-			containerStyle={{ overflow: "visible" }}
+			containerStyle={{ overflow: "visible", marginBottom: 8 }}
 			childrenContainerStyle={{ overflow: "visible" }}
 			onSwipeableOpen={() => {
 				onDelete?.(id);
@@ -141,7 +145,7 @@ const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
 			<View
 				onLayout={onLayout}
 				style={checked ? undefined : cardShadow}
-				className={`${strikeBg} border-border mb-2 h-max w-full flex-row gap-2 rounded-2xl p-3`}
+				className={`${strikeBg} border-border h-max w-full flex-row gap-2 rounded-2xl p-3`}
 			>
 				<CheckBox value={checked} onChange={handleToggle} />
 				<Pressable onPress={() => onPress?.(item)} className={`${strikeBg} flex-1`}>
