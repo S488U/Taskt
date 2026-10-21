@@ -1,26 +1,35 @@
-import { View, Pressable } from "react-native";
-import { useState } from "react";
+import React, { memo, useState, useCallback } from "react";
+import { View, Pressable, LayoutChangeEvent } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, { Extrapolation, interpolate, useAnimatedStyle } from "react-native-reanimated";
+import Animated, {
+	Extrapolation,
+	interpolate,
+	useAnimatedStyle,
+	SharedValue,
+} from "react-native-reanimated";
 
 // components
 import AppText from "./AppText";
 import CheckBox from "./CheckBox";
 import PatternPill from "./PatternPill";
 
-//utils
+// utils
 import { cardShadow } from "../utils/customShadow";
+import type { TaskEntity } from "../features/tasks/task.types";
 
 const AnimatedMaterialIcons = Animated.createAnimatedComponent(MaterialIcons);
 
-const RightAction = ({ progress, dragX, cardWidth }) => {
+interface RightActionProps {
+	progress: SharedValue<number>;
+	dragX: SharedValue<number>;
+	cardWidth: number;
+}
+
+const RightAction: React.FC<RightActionProps> = ({ progress, dragX, cardWidth }) => {
 	const panelAnimatedStyle = useAnimatedStyle(() => {
 		const revealedWidth = Math.min(Math.max(-dragX.value, 0), cardWidth);
-
-		return {
-			width: revealedWidth,
-		};
+		return { width: revealedWidth };
 	});
 
 	const binAnimatedStyle = useAnimatedStyle(() => {
@@ -88,25 +97,35 @@ const RightAction = ({ progress, dragX, cardWidth }) => {
 	);
 };
 
-const Card = ({ item, onDelete, onToggle, onPress }) => {
+export interface CardProps {
+	item: TaskEntity;
+	onDelete?: (id: string) => void;
+	onToggle?: (id: string, nextValue: boolean) => void;
+	onPress?: (task: TaskEntity) => void;
+}
+
+const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
 	const [cardWidth, setCardWidth] = useState(0);
+
+	const onLayout = useCallback((e: LayoutChangeEvent) => {
+		const newWidth = e.nativeEvent.layout.width;
+		setCardWidth((prev) => (prev === newWidth ? prev : newWidth));
+	}, []);
+
 	if (!item) return null;
 
 	const id = item.id;
-	const checked = item.status === "done" || item.status === true;
+	const checked = item.status === "done";
 	const title = item.title?.trim() || "";
 	const desc = item.description?.trim();
-	const pattern = item.kind ? (item.kind === "one_time" ? "one-time" : "recurring") : item.pattern?.trim();
-	let newTitle = title;
-	if (title.length > 30) {
-		newTitle = title.substring(0, 30) + "...";
-	}
+	const pattern = item.kind ? (item.kind === "one_time" ? "one-time" : "recurring") : "one-time";
+	const newTitle = title.length > 30 ? title.substring(0, 30) + "..." : title;
 
 	const strikeThroughText = checked ? "line-through text-text/20" : "";
 	const strikeSubText = checked ? "line-through text-secondary/20" : "text-secondary";
 	const strikeBg = checked ? "bg-background" : "bg-surface";
 
-	const handleToggle = (nextValue) => {
+	const handleToggle = (nextValue: boolean) => {
 		onToggle?.(id, nextValue);
 	};
 
@@ -123,12 +142,12 @@ const Card = ({ item, onDelete, onToggle, onPress }) => {
 			)}
 		>
 			<View
-				onLayout={(e) => setCardWidth(e.nativeEvent.layout.width)}
+				onLayout={onLayout}
 				style={cardShadow}
-				className={` ${strikeBg} border-border mb-2 h-max w-full flex-row gap-2 rounded-2xl p-3 shadow-lg`}
+				className={`${strikeBg} border-border mb-2 h-max w-full flex-row gap-2 rounded-2xl p-3 shadow-lg`}
 			>
 				<CheckBox value={checked} onChange={handleToggle} />
-				<Pressable onPress={() => onPress?.(item)} className={` ${strikeBg} flex-1`}>
+				<Pressable onPress={() => onPress?.(item)} className={`${strikeBg} flex-1`}>
 					<View className="flex flex-row items-center">
 						<AppText
 							className={`${strikeThroughText} font-interMedium text-text flex-1 text-lg capitalize`}
@@ -139,7 +158,7 @@ const Card = ({ item, onDelete, onToggle, onPress }) => {
 					</View>
 
 					{desc && (
-						<AppText className={` ${strikeSubText} text-secondary h-fit`}>
+						<AppText className={`${strikeSubText} text-secondary h-fit`}>
 							{desc.length > 95 ? desc.substring(0, 95) + "..." : desc}
 						</AppText>
 					)}
@@ -149,4 +168,15 @@ const Card = ({ item, onDelete, onToggle, onPress }) => {
 	);
 };
 
-export default Card;
+export default memo(Card, (prev, next) => {
+	return (
+		prev.item.id === next.item.id &&
+		prev.item.status === next.item.status &&
+		prev.item.title === next.item.title &&
+		prev.item.description === next.item.description &&
+		prev.item.kind === next.item.kind &&
+		prev.onDelete === next.onDelete &&
+		prev.onToggle === next.onToggle &&
+		prev.onPress === next.onPress
+	);
+});

@@ -136,58 +136,82 @@ const CalendarScreen = () => {
 	}, [allTasks, selectedDate, activeFilter, isTaskOnDate]);
 
 	// Task actions (matching SavedTasks.tsx behavior)
-	const handleToggle = async (id: string, nextChecked: boolean) => {
-		triggerHaptic(hapticsEnabled, nextChecked ? "success" : "selection");
-		const nextStatus: TaskStatus = nextChecked ? "done" : "pending";
-		const currentTask = allTasks.find((item) => item.id === id);
+	const handleToggle = useCallback(
+		async (id: string, nextChecked: boolean) => {
+			triggerHaptic(hapticsEnabled, nextChecked ? "success" : "selection");
+			const nextStatus: TaskStatus = nextChecked ? "done" : "pending";
 
-		setAllTasks((prev) => prev.map((item) => (item.id === id ? { ...item, status: nextStatus } : item)));
+			let currentTask: TaskEntity | undefined;
+			setAllTasks((prev) => {
+				currentTask = prev.find((item) => item.id === id);
+				return prev.map((item) => (item.id === id ? { ...item, status: nextStatus } : item));
+			});
 
-		try {
-			await taskService.updateStatus(id, nextStatus);
+			try {
+				await taskService.updateStatus(id, nextStatus);
 
-			if (nextChecked) {
-				if (currentTask?.notificationId) {
-					await cancelTaskReminders(currentTask.notificationId);
-					await taskService.updateNotificationId(id, null);
+				if (nextChecked) {
+					if (currentTask?.notificationId) {
+						await cancelTaskReminders(currentTask.notificationId);
+						await taskService.updateNotificationId(id, null);
+					}
+				} else if (currentTask) {
+					const newNotificationId = await scheduleTaskReminder({
+						...currentTask,
+						status: "pending",
+					});
+					if (newNotificationId) {
+						await taskService.updateNotificationId(id, newNotificationId);
+						setAllTasks((prev) =>
+							prev.map((item) => (item.id === id ? { ...item, notificationId: newNotificationId } : item))
+						);
+					}
 				}
-			} else if (currentTask) {
-				const newNotificationId = await scheduleTaskReminder({
-					...currentTask,
-					status: "pending",
-				});
-				if (newNotificationId) {
-					await taskService.updateNotificationId(id, newNotificationId);
-					setAllTasks((prev) =>
-						prev.map((item) => (item.id === id ? { ...item, notificationId: newNotificationId } : item))
-					);
+			} catch (error) {
+				console.error("Error updating status in calendar:", error);
+			}
+		},
+		[hapticsEnabled]
+	);
+
+	const handleDelete = useCallback(
+		async (id: string) => {
+			triggerHaptic(hapticsEnabled, "warning");
+			let taskToDelete: TaskEntity | undefined;
+			setAllTasks((prev) => {
+				taskToDelete = prev.find((item) => item?.id === id);
+				return prev.filter((item) => item?.id !== id);
+			});
+
+			try {
+				if (taskToDelete?.notificationId) {
+					await cancelTaskReminders(taskToDelete.notificationId);
 				}
+				await taskService.deleteTask(id);
+			} catch (error) {
+				console.error("Error deleting task in calendar:", error);
 			}
-		} catch (error) {
-			console.error("Error updating status in calendar:", error);
-		}
-	};
+		},
+		[hapticsEnabled]
+	);
 
-	const handleDelete = async (id: string) => {
-		triggerHaptic(hapticsEnabled, "warning");
-		const taskToDelete = allTasks.find((item) => item?.id === id);
-		setAllTasks((prev) => prev.filter((item) => item?.id !== id));
+	const handleEdit = useCallback(
+		(task: TaskEntity) => {
+			triggerHaptic(hapticsEnabled, "selection");
+			loadDraft(task);
+			router.push({ pathname: "/edit", params: { id: task.id } });
+		},
+		[hapticsEnabled, loadDraft]
+	);
 
-		try {
-			if (taskToDelete?.notificationId) {
-				await cancelTaskReminders(taskToDelete.notificationId);
-			}
-			await taskService.deleteTask(id);
-		} catch (error) {
-			console.error("Error deleting task in calendar:", error);
-		}
-	};
+	const keyExtractor = useCallback((item: TaskEntity) => item.id, []);
 
-	const handleEdit = (task: TaskEntity) => {
-		triggerHaptic(hapticsEnabled, "selection");
-		loadDraft(task);
-		router.push({ pathname: "/edit", params: { id: task.id } });
-	};
+	const renderItem = useCallback(
+		({ item }: { item: TaskEntity }) => (
+			<Card item={item} onDelete={handleDelete} onToggle={handleToggle} onPress={handleEdit} />
+		),
+		[handleDelete, handleToggle, handleEdit]
+	);
 
 	const isSelectedToday = selectedDateStr === todayStr;
 	const selectedDateLabel = isSelectedToday ? "Today" : formatSelectedDate(selectedDate);
@@ -369,13 +393,13 @@ const CalendarScreen = () => {
 				<FlatList
 					className="flex-1"
 					data={tasksForSelectedDate}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => (
-						<Card item={item} onDelete={handleDelete} onToggle={handleToggle} onPress={handleEdit} />
-					)}
+					keyExtractor={keyExtractor}
+					renderItem={renderItem}
 					contentContainerClassName="flex flex-col gap-2 pb-6 px-0.5"
 					showsVerticalScrollIndicator={false}
-					removeClippedSubviews={false}
+					removeClippedSubviews={true}
+					maxToRenderPerBatch={8}
+					windowSize={5}
 				/>
 			) : (
 				<View className="flex-1 items-center justify-center pb-12">
