@@ -11,6 +11,8 @@ import DateGrid from "./DateGrid";
 import SchedulerLayout from "../layout/SchedulerLayout";
 import { getCurrentTime } from "../../../utils/temporal/timePicker";
 import { useTaskDraft } from "../../../context/TaskDraftContext";
+import { useSettings } from "../../../context/SettingsContext";
+import { triggerHaptic } from "../../../utils/haptics";
 
 const formatMonthYear = (displayedMonth: Temporal.PlainYearMonth) => {
 	return displayedMonth.toPlainDate({ day: 1 }).toLocaleString(undefined, {
@@ -21,6 +23,7 @@ const formatMonthYear = (displayedMonth: Temporal.PlainYearMonth) => {
 
 const DateScreen = () => {
 	const { draft, updateDraft } = useTaskDraft();
+	const { hapticsEnabled } = useSettings();
 	const today = useMemo(() => getToday(), []);
 
 	/*
@@ -60,20 +63,22 @@ const DateScreen = () => {
 	const monthTitle = useMemo(() => formatMonthYear(displayedMonth), [displayedMonth]);
 
 	const goToPreviousMonth = useCallback(() => {
+		triggerHaptic(hapticsEnabled, "selection");
 		setDisplayedMonth((currentMonth) =>
 			currentMonth.subtract({
 				months: 1,
 			})
 		);
-	}, []);
+	}, [hapticsEnabled]);
 
 	const goToNextMonth = useCallback(() => {
+		triggerHaptic(hapticsEnabled, "selection");
 		setDisplayedMonth((currentMonth) =>
 			currentMonth.add({
 				months: 1,
 			})
 		);
-	}, []);
+	}, [hapticsEnabled]);
 
 	const handleConfirm = () => {
 		updateDraft({ date: selectedDate.toString() });

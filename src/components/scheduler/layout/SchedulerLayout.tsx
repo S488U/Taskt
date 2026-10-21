@@ -3,6 +3,8 @@ import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AppText from "../../AppText";
+import { useSettings } from "../../../context/SettingsContext";
+import { triggerHaptic } from "../../../utils/haptics";
 
 interface SchedulerLayoutProps {
 	title: string;
@@ -11,6 +13,8 @@ interface SchedulerLayoutProps {
 }
 
 const SchedulerLayout = ({ title, children, onConfirm }: SchedulerLayoutProps) => {
+	const { hapticsEnabled } = useSettings();
+
 	return (
 		<View className="bg-background flex-1 flex-col justify-between px-6 py-4">
 			<StatusBar style="dark" animated />
@@ -18,7 +22,12 @@ const SchedulerLayout = ({ title, children, onConfirm }: SchedulerLayoutProps) =
 			<View className="mt-5 mb-5 justify-center">
 				<View className="w-full flex-row items-center">
 					<View className="absolute w-20 items-center">
-						<Pressable onPress={() => router.back()}>
+						<Pressable
+							onPress={() => {
+								triggerHaptic(hapticsEnabled, "impact");
+								router.back();
+							}}
+						>
 							<Ionicons name="close" size={24} color="#64748B" />
 						</Pressable>
 					</View>
@@ -35,7 +44,10 @@ const SchedulerLayout = ({ title, children, onConfirm }: SchedulerLayoutProps) =
 			{/* Pressable confirm Date */}
 			<View>
 				<Pressable
-					onPress={onConfirm ?? (() => router.back())}
+					onPress={() => {
+						triggerHaptic(hapticsEnabled, "impact");
+						(onConfirm ?? (() => router.back()))();
+					}}
 					className="bg-primary rounded-2xl border border-slate-400 py-1"
 				>
 					<AppText className="text-surface my-3 text-center text-xl capitalize">Confirm {title}</AppText>

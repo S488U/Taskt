@@ -13,10 +13,11 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 // custom hooks
 import useGreeter from "../../hooks/useGreeter";
 import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 
 const TodoScreen = () => {
 	const { greeter } = useGreeter();
-	const { greeterSize } = useSettings();
+	const { greeterSize, hapticsEnabled } = useSettings();
 
 	return (
 		<View className="bg-background relative flex-1 p-3 px-4">
@@ -32,7 +33,10 @@ const TodoScreen = () => {
 				<FloatingButton
 					icon={<FontAwesome6 name="add" size={20} color="#FFFFFF" />}
 					// onPress={() => setShowCreate(true)}
-					onPress={() => router.push("/create")}
+					onPress={() => {
+						triggerHaptic(hapticsEnabled, "impact");
+						router.push("/create");
+					}}
 				/>
 			</View>
 		</View>

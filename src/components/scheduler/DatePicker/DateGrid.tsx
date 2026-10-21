@@ -3,6 +3,8 @@ import { View, Pressable } from "react-native";
 import { getCalendarDates } from "../../../utils/temporal/datePicker";
 import { Temporal } from "@js-temporal/polyfill";
 import AppText from "../../AppText";
+import { useSettings } from "../../../context/SettingsContext";
+import { triggerHaptic } from "../../../utils/haptics";
 
 type DatePickerGridProps = {
 	displayedMonth: Temporal.PlainYearMonth;
@@ -20,6 +22,7 @@ const CELL_WIDTH_PERCENT = `${100 / 7}%`;
 
 const DateGrid = memo(
 	({ displayedMonth, selectedDate, today, setDisplayedMonth, setSelectedDate }: DatePickerGridProps) => {
+		const { hapticsEnabled } = useSettings();
 		// 1. Memoize calendar dates
 		const calendarDates = useMemo(() => getCalendarDates(displayedMonth), [displayedMonth]);
 
@@ -30,6 +33,7 @@ const DateGrid = memo(
 
 		const handleDatePress = useCallback(
 			(date: Temporal.PlainDate) => {
+				triggerHaptic(hapticsEnabled, "selection");
 				setSelectedDate(date);
 
 				if (date.year !== displayedMonth.year || date.month !== displayedMonth.month) {
@@ -41,7 +45,7 @@ const DateGrid = memo(
 					);
 				}
 			},
-			[displayedMonth, setDisplayedMonth, setSelectedDate]
+			[displayedMonth, setDisplayedMonth, setSelectedDate, hapticsEnabled]
 		);
 
 		return (

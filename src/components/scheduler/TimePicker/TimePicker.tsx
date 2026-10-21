@@ -6,6 +6,8 @@ import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native
 import AppText from "../../AppText";
 import WheelItem, { ITEM_HEIGHT } from "./WheelItem";
 import { getCurrentTimeSegments } from "../../../utils/temporal/timePicker";
+import { useSettings } from "../../../context/SettingsContext";
+import { triggerHaptic } from "../../../utils/haptics";
 
 type Meridian = "AM" | "PM";
 
@@ -30,6 +32,7 @@ export type TimePickerRef = {
 };
 
 const TimePicker = forwardRef<TimePickerRef>((_, ref) => {
+	const { hapticsEnabled } = useSettings();
 	const initialTime = useMemo(() => getCurrentTimeSegments(), []);
 	const [hour, setHour] = useState(initialTime.hour);
 	const [minute, setMinute] = useState(initialTime.minute);
@@ -100,6 +103,7 @@ const TimePicker = forwardRef<TimePickerRef>((_, ref) => {
 
 	// Hour Selection
 	const handleHourMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+		triggerHaptic(hapticsEnabled, "selection");
 		const offset = event.nativeEvent.contentOffset.y;
 
 		const index = Math.round(offset / ITEM_HEIGHT);
@@ -137,6 +141,7 @@ const TimePicker = forwardRef<TimePickerRef>((_, ref) => {
 
 	// Minute Selection
 	const handleMinuteMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+		triggerHaptic(hapticsEnabled, "selection");
 		const offset = event.nativeEvent.contentOffset.y;
 
 		const index = Math.round(offset / ITEM_HEIGHT);
@@ -163,6 +168,7 @@ const TimePicker = forwardRef<TimePickerRef>((_, ref) => {
 
 	// Meridian Selector
 	const handleMeridianMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+		triggerHaptic(hapticsEnabled, "selection");
 		const offset = event.nativeEvent.contentOffset.y;
 		const index = Math.round(offset / ITEM_HEIGHT);
 		const normalizedValue = Math.max(0, Math.min(1, index));

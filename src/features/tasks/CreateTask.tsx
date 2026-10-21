@@ -14,11 +14,14 @@ import AppTextInput from "../../components/AppTextInput";
 import AppText from "../../components/AppText";
 
 import { useTaskDraft } from "../../context/TaskDraftContext";
+import { useSettings } from "../../context/SettingsContext";
+import { triggerHaptic } from "../../utils/haptics";
 import { taskService } from "../../db/taskService";
 import { scheduleTaskReminder } from "../../utils/notificationService";
 import type { TaskEntity } from "./task.types";
 
 const CreateTask = () => {
+	const { hapticsEnabled } = useSettings();
 	const [patternWidth, setPatternWidth] = useState(0);
 	const descriptionInputRef = useRef<TextInputInstance>(null);
 	const [validationErrors, setValidationErrors] = useState({
@@ -89,6 +92,7 @@ const CreateTask = () => {
 			}
 
 			await taskService.createTask(newTask);
+			triggerHaptic(hapticsEnabled, "success");
 			resetDraft();
 			router.dismissAll();
 		} catch (error) {
@@ -102,6 +106,7 @@ const CreateTask = () => {
 				<View className="mt-3 flex-row items-center">
 					<Pressable
 						onPress={() => {
+							triggerHaptic(hapticsEnabled, "impact");
 							resetDraft();
 							router.dismissAll();
 						}}
@@ -168,6 +173,7 @@ const CreateTask = () => {
 							/>
 							<Pressable
 								onPress={() => {
+									triggerHaptic(hapticsEnabled, "selection");
 									updateDraft({ pattern: "one-time" });
 								}}
 								className="flex-1 rounded-xl"
@@ -180,6 +186,7 @@ const CreateTask = () => {
 							</Pressable>
 							<Pressable
 								onPress={() => {
+									triggerHaptic(hapticsEnabled, "selection");
 									updateDraft({ pattern: "recurring" });
 								}}
 								className="flex-1 rounded-xl"
