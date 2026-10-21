@@ -13,11 +13,13 @@ import type { TaskEntity, TaskStatus } from "./task.types";
 import { DAY_LABELS } from "../../utils/scheduleUtils";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
 import { useTaskDraft } from "../../context/TaskDraftContext";
+import { useSettings } from "../../context/SettingsContext";
 
 const SavedTasks = () => {
 	const [allTasks, setAllTasks] = useState<TaskEntity[]>([]);
 	const [viewAll, setViewAll] = useState(false);
 	const { loadDraft } = useTaskDraft();
+	const { showProgressCard } = useSettings();
 
 	const loadTasks = async () => {
 		try {
@@ -126,7 +128,7 @@ const SavedTasks = () => {
 
 	return (
 		<>
-			<ProgressCard todoExtra={todoExtra} />
+			{showProgressCard && <ProgressCard todoExtra={todoExtra} />}
 
 			<View className="mb-3 flex-row items-center justify-between px-2">
 				<AppText className="font-interBold text-text text-xl capitalize">

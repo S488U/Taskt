@@ -4,20 +4,38 @@ import { loadSettings, storeSettings } from "../utils/storageUtils";
 interface SettingsContextType {
 	greeterSize: boolean;
 	setGreeterSize: (val: boolean) => void;
+	showProgressCard: boolean;
+	setShowProgressCard: (val: boolean) => void;
+	hapticsEnabled: boolean;
+	setHapticsEnabled: (val: boolean) => void;
 }
 
 const SETTING_GREETER_SIZE = "greeter_size";
+const SETTING_SHOW_PROGRESS_CARD = "show_progress_card";
+const SETTING_HAPTICS = "haptics_enabled";
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
 	const [greeterSize, setGreeterSizeState] = useState<boolean>(false);
+	const [showProgressCard, setShowProgressCardState] = useState<boolean>(true);
+	const [hapticsEnabled, setHapticsEnabledState] = useState<boolean>(true);
 
 	useEffect(() => {
 		const initSettings = async () => {
-			const saved = await loadSettings(SETTING_GREETER_SIZE);
-			if (typeof saved === "boolean") {
-				setGreeterSizeState(saved);
+			const savedGreeter = await loadSettings(SETTING_GREETER_SIZE);
+			if (typeof savedGreeter === "boolean") {
+				setGreeterSizeState(savedGreeter);
+			}
+
+			const savedProgress = await loadSettings(SETTING_SHOW_PROGRESS_CARD);
+			if (typeof savedProgress === "boolean") {
+				setShowProgressCardState(savedProgress);
+			}
+
+			const savedHaptics = await loadSettings(SETTING_HAPTICS);
+			if (typeof savedHaptics === "boolean") {
+				setHapticsEnabledState(savedHaptics);
 			}
 		};
 
@@ -29,13 +47,29 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 		await storeSettings(SETTING_GREETER_SIZE, val);
 	}, []);
 
-	const contextValue = useMemo(() => ({ greeterSize, setGreeterSize }), [greeterSize, setGreeterSize]);
+	const setShowProgressCard = useCallback(async (val: boolean) => {
+		setShowProgressCardState(val);
+		await storeSettings(SETTING_SHOW_PROGRESS_CARD, val);
+	}, []);
 
-	return (
-		<SettingsContext.Provider value={contextValue}>
-			{children}
-		</SettingsContext.Provider>
+	const setHapticsEnabled = useCallback(async (val: boolean) => {
+		setHapticsEnabledState(val);
+		await storeSettings(SETTING_HAPTICS, val);
+	}, []);
+
+	const contextValue = useMemo(
+		() => ({
+			greeterSize,
+			setGreeterSize,
+			showProgressCard,
+			setShowProgressCard,
+			hapticsEnabled,
+			setHapticsEnabled,
+		}),
+		[greeterSize, setGreeterSize, showProgressCard, setShowProgressCard, hapticsEnabled, setHapticsEnabled]
 	);
+
+	return <SettingsContext.Provider value={contextValue}>{children}</SettingsContext.Provider>;
 };
 
 export const useSettings = () => {

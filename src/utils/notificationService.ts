@@ -219,3 +219,11 @@ export async function requestBatteryOptimizationExemption(): Promise<void> {
 		console.warn("Could not request battery optimization exemption:", error);
 	}
 }
+
+export async function cancelAllReminders(): Promise<void> {
+	try {
+		await Notifications.cancelAllScheduledNotificationsAsync();
+	} catch (error) {
+		console.error("Error cancelling all notifications:", error);
+	}
+}
