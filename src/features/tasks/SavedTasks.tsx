@@ -7,6 +7,9 @@ import { Temporal } from "@js-temporal/polyfill";
 import Card from "../../components/Card";
 import AppText from "../../components/AppText";
 import ProgressCard from "../../components/ProgressCard";
+import EmptyState from "../../components/EmptyState";
+import FloatingButton from "../../components/FloatingButton";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 import { taskService } from "../../db/taskService";
 import type { TaskEntity, TaskStatus } from "./task.types";
@@ -143,6 +146,47 @@ const SavedTasks = () => {
 		[handleDelete, handleToggle, handleEdit]
 	);
 
+	// State 1: Brand New User (Zero tasks exist anywhere in the app)
+	if (allTasks.length === 0) {
+		return (
+			<EmptyState
+				type="first_time"
+				title="Plan your day with Taskt"
+				description="Set up one-time reminders or recurring habits. Everything is saved locally and rings on time."
+				buttonText="Create a Task"
+				onAction={() => {
+					triggerHaptic(hapticsEnabled, "impact");
+					router.push("/create");
+				}}
+			/>
+		);
+	}
+
+	// State 2: Daily Clear (Tasks exist in DB, but none scheduled for today or all done)
+	if (visibleTasks.length === 0) {
+		return (
+			<>
+				{showProgressCard && todoExtra.length > 0 && <ProgressCard todoExtra={todoExtra} />}
+				<EmptyState
+					type="all_clear"
+					title="All clear for today"
+					description="Your daily tasks have been completed or you haven't scheduled any for today. Ready to start fresh?"
+					buttonText="Schedule a Task"
+					secondaryButtonText={viewAll ? undefined : "View All Tasks"}
+					onAction={() => {
+						triggerHaptic(hapticsEnabled, "impact");
+						router.push("/create");
+					}}
+					onSecondaryAction={() => {
+						triggerHaptic(hapticsEnabled, "selection");
+						setViewAll(true);
+					}}
+				/>
+			</>
+		);
+	}
+
+	// State 3: Active Task List
 	return (
 		<>
 			{showProgressCard && <ProgressCard todoExtra={todoExtra} />}
@@ -161,23 +205,24 @@ const SavedTasks = () => {
 					{viewAll ? "View Today" : "View All"}
 				</AppText>
 			</View>
-			{visibleTasks.length > 0 ? (
-				<FlatList
-					className="flex-1"
-					data={visibleTasks}
-					keyExtractor={keyExtractor}
-					renderItem={renderItem}
-					contentContainerClassName="flex flex-col gap-2 pb-12 px-0.5"
-					showsVerticalScrollIndicator={false}
-					removeClippedSubviews={true}
-					maxToRenderPerBatch={8}
-					windowSize={5}
-				/>
-			) : (
-				<View className="flex-1 items-center justify-center">
-					<AppText className="text-secondary italic">Add Task to list here</AppText>
-				</View>
-			)}
+			<FlatList
+				className="flex-1"
+				data={visibleTasks}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
+				contentContainerClassName="flex flex-col gap-2 pb-12 px-0.5"
+				showsVerticalScrollIndicator={false}
+				removeClippedSubviews={true}
+				maxToRenderPerBatch={8}
+				windowSize={5}
+			/>
+			<FloatingButton
+				icon={<FontAwesome6 name="add" size={20} color="#FFFFFF" />}
+				onPress={() => {
+					triggerHaptic(hapticsEnabled, "impact");
+					router.push("/create");
+				}}
+			/>
 		</>
 	);
 };
