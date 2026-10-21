@@ -1,7 +1,9 @@
-import { Tabs } from "expo-router";
+import { useEffect } from "react";
 import { View } from "react-native";
+import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 
 type TabIconProps = {
 	name: keyof typeof Ionicons.glyphMap;
@@ -9,18 +11,46 @@ type TabIconProps = {
 	focused: boolean;
 };
 
-const TabIcon = ({ name, focusedName, focused }: TabIconProps) => {
+const AnimatedTabIcon = ({ name, focusedName, focused }: TabIconProps) => {
+	const scaleX = useSharedValue(focused ? 1 : 0.3);
+	const opacity = useSharedValue(focused ? 1 : 0);
+
+	useEffect(() => {
+		if (focused) {
+			scaleX.value = withSpring(1, { damping: 14, stiffness: 160 });
+			opacity.value = withTiming(1, { duration: 160 });
+		} else {
+			scaleX.value = withTiming(0.3, { duration: 140 });
+			opacity.value = withTiming(0, { duration: 140 });
+		}
+	}, [focused, scaleX, opacity]);
+
+	const pillAnimatedStyle = useAnimatedStyle(() => ({
+		transform: [{ scaleX: scaleX.value }],
+		opacity: opacity.value,
+	}));
+
 	return (
 		<View
 			style={{
 				width: 58,
 				height: 32,
-				borderRadius: 16,
 				alignItems: "center",
 				justifyContent: "center",
-				backgroundColor: focused ? "#EEF2FF" : "transparent",
 			}}
 		>
+			<Animated.View
+				style={[
+					{
+						position: "absolute",
+						width: 58,
+						height: 32,
+						borderRadius: 16,
+						backgroundColor: "#EEF2FF",
+					},
+					pillAnimatedStyle,
+				]}
+			/>
 			<Ionicons name={focused ? focusedName : name} size={22} color={focused ? "#4F46E5" : "#64748B"} />
 		</View>
 	);
@@ -54,7 +84,9 @@ const TabLayout = () => {
 				name="index"
 				options={{
 					title: "Home",
-					tabBarIcon: ({ focused }) => <TabIcon name="home-outline" focusedName="home" focused={focused} />,
+					tabBarIcon: ({ focused }) => (
+						<AnimatedTabIcon name="home-outline" focusedName="home" focused={focused} />
+					),
 				}}
 			/>
 			<Tabs.Screen
@@ -62,7 +94,7 @@ const TabLayout = () => {
 				options={{
 					title: "Calendar",
 					tabBarIcon: ({ focused }) => (
-						<TabIcon name="calendar-outline" focusedName="calendar" focused={focused} />
+						<AnimatedTabIcon name="calendar-outline" focusedName="calendar" focused={focused} />
 					),
 				}}
 			/>
@@ -71,7 +103,7 @@ const TabLayout = () => {
 				options={{
 					title: "Settings",
 					tabBarIcon: ({ focused }) => (
-						<TabIcon name="settings-outline" focusedName="settings" focused={focused} />
+						<AnimatedTabIcon name="settings-outline" focusedName="settings" focused={focused} />
 					),
 				}}
 			/>
