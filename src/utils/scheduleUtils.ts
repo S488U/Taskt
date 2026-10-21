@@ -1,32 +1,14 @@
+import { Temporal } from "@js-temporal/polyfill";
 import type { RecurringMode, Weekday } from "../features/tasks/task.types";
 
 export const DAY_LABELS: Weekday[] = ["Su", "M", "T", "W", "Th", "F", "S"];
 
-export const formatDate = (value: Date) =>
-	value.toLocaleDateString(undefined, {
-		weekday: "short",
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-
-export const formatTime = (value: Date) =>
-	value.toLocaleTimeString(undefined, {
-		hour: "2-digit",
-		minute: "2-digit",
-		hour12: true,
-	});
-
-export const toTime24 = (value: Date): string => {
-	const hh = String(value.getHours()).padStart(2, "0");
-	const mm = String(value.getMinutes()).padStart(2, "0");
-	return `${hh}:${mm}`;
-};
-
 export const getPresetDays = (mode: RecurringMode): Weekday[] => {
 	if (mode === "everyday") return DAY_LABELS;
-	if (mode === "today") return [DAY_LABELS[new Date().getDay()]];
-	if (mode === "tomorrow") return [DAY_LABELS[(new Date().getDay() + 1) % 7]];
+	const today = Temporal.Now.plainDateISO();
+	const todayIndex = today.dayOfWeek % 7; // Su = 0, M = 1 ... S = 6
+	if (mode === "today") return [DAY_LABELS[todayIndex]];
+	if (mode === "tomorrow") return [DAY_LABELS[(todayIndex + 1) % 7]];
 	return [];
 };
 
@@ -35,32 +17,32 @@ interface Schedule {
 	time: string;
 }
 
-export const hasFutureOccurrence = (schedule: Schedule, now = new Date()): boolean => {
+export const hasFutureOccurrence = (schedule: Schedule, now?: Temporal.PlainDateTime): boolean => {
 	if (!schedule?.days?.length || !schedule?.time) return false;
 
 	const [hh, mm] = schedule.time.split(":").map(Number);
 	if (Number.isNaN(hh) || Number.isNaN(mm)) return false;
 
-	// Validate against the current cycle (today + next 6 days).
-	// This prevents selecting "today" with an already passed time.
-	for (let offset = 0; offset <= 6; offset += 1) {
-		const candidate = new Date(now);
-		candidate.setHours(0, 0, 0, 0);
-		candidate.setDate(candidate.getDate() + offset);
+	const currentNow = now ?? Temporal.Now.plainDateTimeISO();
+	const todayDate = currentNow.toPlainDate();
+	const targetTime = Temporal.PlainTime.from({ hour: hh, minute: mm });
 
-		const dayLabel = DAY_LABELS[candidate.getDay()];
+	// Validate against the current cycle (today + next 6 days)
+	for (let offset = 0; offset <= 6; offset += 1) {
+		const candidateDate = todayDate.add({ days: offset });
+		const dayLabel = DAY_LABELS[candidateDate.dayOfWeek % 7];
 		if (!schedule.days.includes(dayLabel)) continue;
 
-		candidate.setHours(hh, mm, 0, 0);
-		if (candidate > now) return true;
+		const candidateDateTime = candidateDate.toPlainDateTime(targetTime);
+		if (Temporal.PlainDateTime.compare(candidateDateTime, currentNow) > 0) {
+			return true;
+		}
 	}
 
 	return false;
 };
 
 export const getTodaysDay = (): Weekday => {
-	const todayIndex = new Date().getDay(); // 0–6
-	const day = DAY_LABELS[todayIndex];
-
-	return day;
+	const today = Temporal.Now.plainDateISO();
+	return DAY_LABELS[today.dayOfWeek % 7];
 };

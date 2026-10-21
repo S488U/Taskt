@@ -1,4 +1,5 @@
 import { eq, desc } from "drizzle-orm";
+import { Temporal } from "@js-temporal/polyfill";
 import { db } from "./index";
 import { taskTable } from "./schema";
 import type { TaskEntity, TaskStatus } from "../features/tasks/task.types";
@@ -13,12 +14,13 @@ export const taskService = {
 	},
 
 	updateStatus: async (id: string, status: TaskStatus) => {
+		const nowStr = Temporal.Now.instant().toString();
 		return await db
 			.update(taskTable)
 			.set({
 				status,
-				updatedAt: new Date().toISOString(),
-				completedAt: status === "done" ? new Date().toISOString() : null,
+				updatedAt: nowStr,
+				completedAt: status === "done" ? nowStr : null,
 			})
 			.where(eq(taskTable.id, id));
 	},
@@ -33,7 +35,7 @@ export const taskService = {
 			.update(taskTable)
 			.set({
 				notificationId,
-				updatedAt: new Date().toISOString(),
+				updatedAt: Temporal.Now.instant().toString(),
 			})
 			.where(eq(taskTable.id, id));
 	},
@@ -43,7 +45,7 @@ export const taskService = {
 			.update(taskTable)
 			.set({
 				...updates,
-				updatedAt: new Date().toISOString(),
+				updatedAt: Temporal.Now.instant().toString(),
 			})
 			.where(eq(taskTable.id, id));
 	},
