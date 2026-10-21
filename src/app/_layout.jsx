@@ -69,9 +69,9 @@ const RootLayout = () => {
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<SettingsProvider>
 				<TaskDraftProvider>
-					<SafeAreaView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
+					<SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
 						<StatusBar style="dark" />
-						<Stack screenOptions={{ headerShown: false }}></Stack>
+						<Stack screenOptions={{ headerShown: false }} />
 					</SafeAreaView>
 				</TaskDraftProvider>
 			</SettingsProvider>
