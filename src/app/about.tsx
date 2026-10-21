@@ -2,7 +2,6 @@ import React from "react";
 import { View, Image, Pressable, Linking } from "react-native";
 import { router } from "expo-router";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 
 import AppText from "../components/AppText";
@@ -12,36 +11,26 @@ import { useSettings } from "../context/SettingsContext";
 const GITHUB_REPO_URL = "https://github.com/S488U/Taskt";
 
 const AboutScreen = () => {
-	const insets = useSafeAreaInsets();
 	const { hapticsEnabled } = useSettings();
 	const appVersion = Constants.expoConfig?.version ?? "0.0.1";
 
 	const handleBack = () => {
-		triggerHaptic(hapticsEnabled);
+		triggerHaptic(hapticsEnabled, "impact");
 		router.back();
 	};
 
 	const handleOpenGitHub = async () => {
 		try {
-			triggerHaptic(hapticsEnabled);
-			const supported = await Linking.canOpenURL(GITHUB_REPO_URL);
-			if (supported) {
-				await Linking.openURL(GITHUB_REPO_URL);
-			}
+			triggerHaptic(hapticsEnabled, "impact");
+			await Linking.openURL(GITHUB_REPO_URL);
 		} catch (error) {
 			console.error("Error opening GitHub URL:", error);
 		}
 	};
 
 	return (
-		<View
-			className="bg-background flex-1 p-4"
-			style={{
-				paddingTop: insets.top > 0 ? insets.top + 8 : 16,
-				paddingBottom: insets.bottom > 0 ? insets.bottom + 8 : 16,
-			}}
-		>
-			<View className="border-border bg-surface flex-1 justify-between rounded-3xl border p-6 shadow-sm">
+		<View className="bg-background flex-1 p-3 pb-4">
+			<View className="border-border bg-surface flex-1 justify-between rounded-3xl border p-5 shadow-sm">
 				{/* Top Bar */}
 				<View className="flex-row items-center gap-2">
 					<Pressable
