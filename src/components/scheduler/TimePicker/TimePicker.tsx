@@ -65,22 +65,26 @@ const TimePicker = forwardRef<TimePickerRef>((_, ref) => {
 
 	const initialMeridianIndex = meridian === "AM" ? 0 : 1;
 
-	useImperativeHandle(ref, () => ({
-		scrollToTime: (h, m, mer) => {
-			setHour(h);
-			setMinute(m);
-			setMeridian(mer);
+	useImperativeHandle(
+		ref,
+		() => ({
+			scrollToTime: (h, m, mer) => {
+				setHour(h);
+				setMinute(m);
+				setMeridian(mer);
 
-			const hourIndex = middleRepeat * HOURS.length + (h - 1);
-			const minuteIndex = middleRepeat * MINUTES.length + m;
-			const meridianIndex = mer === "AM" ? 0 : 1;
+				const hourIndex = middleRepeat * HOURS.length + (h - 1);
+				const minuteIndex = middleRepeat * MINUTES.length + m;
+				const meridianIndex = mer === "AM" ? 0 : 1;
 
-			hourRef.current?.scrollToOffset({ offset: hourIndex * ITEM_HEIGHT, animated: true });
-			minuteRef.current?.scrollToOffset({ offset: minuteIndex * ITEM_HEIGHT, animated: true });
-			meridianRef.current?.scrollToOffset({ offset: meridianIndex * ITEM_HEIGHT, animated: true });
-		},
-		getTime: () => ({ hour, minute, meridian }),
-	}), [hour, minute, meridian, middleRepeat]);
+				hourRef.current?.scrollToOffset({ offset: hourIndex * ITEM_HEIGHT, animated: true });
+				minuteRef.current?.scrollToOffset({ offset: minuteIndex * ITEM_HEIGHT, animated: true });
+				meridianRef.current?.scrollToOffset({ offset: meridianIndex * ITEM_HEIGHT, animated: true });
+			},
+			getTime: () => ({ hour, minute, meridian }),
+		}),
+		[hour, minute, meridian, middleRepeat]
+	);
 
 	// Scroll Handlers
 	const hourScrollHandler = useAnimatedScrollHandler({

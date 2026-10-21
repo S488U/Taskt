@@ -110,11 +110,7 @@ const OneTime = ({ onErrorChange }: OneTimeProps) => {
 					>
 						<AppText className={`text-xs ${isPast ? "text-danger" : "text-secondary"}`}>Time</AppText>
 						<View className="mt-1 flex-row items-center gap-2">
-							<FontAwesome6
-								name={clockIcon}
-								size={16}
-								color={isPast ? COLOR_DANGER : COLOR_SECONDARY}
-							/>
+							<FontAwesome6 name={clockIcon} size={16} color={isPast ? COLOR_DANGER : COLOR_SECONDARY} />
 							<AppText
 								className={`text-base ${isPast ? "text-danger" : "text-secondary"} leading-5 uppercase`}
 							>
@@ -126,8 +122,8 @@ const OneTime = ({ onErrorChange }: OneTimeProps) => {
 				{isPast && (
 					<View className="mt-1 ml-1">
 						<AppText className="text-danger text-xs">
-							Selected: {formatDateString(draft.date)} at {formatTimeString(draft.time)}. Please choose a future
-							time.
+							Selected: {formatDateString(draft.date)} at {formatTimeString(draft.time)}. Please choose a
+							future time.
 						</AppText>
 					</View>
 				)}

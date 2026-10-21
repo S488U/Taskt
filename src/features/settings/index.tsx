@@ -12,14 +12,8 @@ import { taskService } from "../../db/taskService";
 import { triggerHaptic } from "../../utils/haptics";
 
 const SettingsPage = () => {
-	const {
-		greeterSize,
-		setGreeterSize,
-		showProgressCard,
-		setShowProgressCard,
-		hapticsEnabled,
-		setHapticsEnabled,
-	} = useSettings();
+	const { greeterSize, setGreeterSize, showProgressCard, setShowProgressCard, hapticsEnabled, setHapticsEnabled } =
+		useSettings();
 
 	const [showClearModal, setShowClearModal] = useState(false);
 	const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -80,9 +74,7 @@ const SettingsPage = () => {
 						{/* Compact Greeter */}
 						<View className="border-border flex-row items-center justify-between border-b p-4">
 							<View className="flex-1 pr-3">
-								<AppText className="font-interMedium text-text text-base">
-									Compact Header
-								</AppText>
+								<AppText className="font-interMedium text-text text-base">Compact Header</AppText>
 								<AppText className="text-secondary font-inter text-xs">
 									Make the greeting title smaller on the home screen
 								</AppText>
@@ -99,9 +91,7 @@ const SettingsPage = () => {
 						{/* Show Progress Card */}
 						<View className="flex-row items-center justify-between p-4">
 							<View className="flex-1 pr-3">
-								<AppText className="font-interMedium text-text text-base">
-									Show Progress Card
-								</AppText>
+								<AppText className="font-interMedium text-text text-base">Show Progress Card</AppText>
 								<AppText className="text-secondary font-inter text-xs">
 									Display daily completion percentage on the home screen
 								</AppText>
@@ -126,9 +116,7 @@ const SettingsPage = () => {
 						{/* Haptic Feedback */}
 						<View className="border-border flex-row items-center justify-between border-b p-4">
 							<View className="flex-1 pr-3">
-								<AppText className="font-interMedium text-text text-base">
-									Haptic Feedback
-								</AppText>
+								<AppText className="font-interMedium text-text text-base">Haptic Feedback</AppText>
 								<AppText className="text-secondary font-inter text-xs">
 									Vibrate on button taps, swipes, and task completion
 								</AppText>
@@ -151,9 +139,7 @@ const SettingsPage = () => {
 							className="flex-row items-center justify-between p-4 active:bg-slate-50"
 						>
 							<View className="flex-1 pr-3">
-								<AppText className="font-interMedium text-text text-base">
-									Background Reminders
-								</AppText>
+								<AppText className="font-interMedium text-text text-base">Background Reminders</AppText>
 								<AppText className="text-secondary font-inter text-xs">
 									Ensure alarms fire reliably when the phone is locked or closed
 								</AppText>
@@ -179,9 +165,7 @@ const SettingsPage = () => {
 									<Ionicons name="share-outline" size={20} color="#4F46E5" />
 								</View>
 								<View>
-									<AppText className="font-interMedium text-text text-base">
-										Export Tasks
-									</AppText>
+									<AppText className="font-interMedium text-text text-base">Export Tasks</AppText>
 									<AppText className="text-secondary font-inter text-xs">
 										Backup or share tasks as a JSON file
 									</AppText>
@@ -231,9 +215,7 @@ const SettingsPage = () => {
 							className="border-border flex-row items-center justify-between border-b p-4 active:bg-slate-50"
 						>
 							<View>
-								<AppText className="font-interMedium text-text text-base">
-									About Taskt
-								</AppText>
+								<AppText className="font-interMedium text-text text-base">About Taskt</AppText>
 								<AppText className="text-secondary font-inter text-xs">
 									Version, offline philosophy, and credits
 								</AppText>
@@ -250,9 +232,7 @@ const SettingsPage = () => {
 							className="border-border flex-row items-center justify-between border-b p-4 active:bg-slate-50"
 						>
 							<View>
-								<AppText className="font-interMedium text-text text-base">
-									Privacy Policy
-								</AppText>
+								<AppText className="font-interMedium text-text text-base">Privacy Policy</AppText>
 								<AppText className="text-secondary font-inter text-xs">
 									Zero-tracking, local-first data policy
 								</AppText>
@@ -269,9 +249,7 @@ const SettingsPage = () => {
 							className="flex-row items-center justify-between p-4 active:bg-slate-50"
 						>
 							<View>
-								<AppText className="font-interMedium text-text text-base">
-									Terms & Conditions
-								</AppText>
+								<AppText className="font-interMedium text-text text-base">Terms & Conditions</AppText>
 								<AppText className="text-secondary font-inter text-xs">
 									Usage terms and system reminder guidance
 								</AppText>
@@ -297,8 +275,8 @@ const SettingsPage = () => {
 
 						<AppText className="font-interBold text-text text-xl">Clear All Tasks?</AppText>
 						<AppText className="text-secondary font-inter mt-2 text-sm leading-5">
-							This will permanently delete all your tasks and cancel any scheduled reminders.
-							This action cannot be undone.
+							This will permanently delete all your tasks and cancel any scheduled reminders. This action
+							cannot be undone.
 						</AppText>
 
 						<View className="mt-6 flex-row justify-end gap-3">
@@ -331,7 +309,7 @@ const SettingsPage = () => {
 			>
 				<View className="flex-1 justify-end bg-black/50">
 					<View className="border-border bg-surface max-h-[80%] rounded-t-3xl border-t p-6 shadow-2xl">
-						<View className="flex-row items-center justify-between pb-3 border-b border-border">
+						<View className="border-border flex-row items-center justify-between border-b pb-3">
 							<AppText className="font-interBold text-text text-xl">Privacy Policy</AppText>
 							<Pressable onPress={() => setShowPrivacyModal(false)} className="p-1">
 								<Ionicons name="close" size={24} color="#64748B" />
@@ -341,25 +319,23 @@ const SettingsPage = () => {
 						<ScrollView className="mt-4 gap-3" showsVerticalScrollIndicator={false}>
 							<AppText className="font-interBold text-text text-sm">1. Local-First Storage</AppText>
 							<AppText className="text-secondary text-xs leading-5">
-								Taskt stores all your tasks, schedules, and custom settings locally on your
-								device via SQLite. We do not transmit or store your personal tasks on any
-								remote servers.
+								Taskt stores all your tasks, schedules, and custom settings locally on your device via
+								SQLite. We do not transmit or store your personal tasks on any remote servers.
 							</AppText>
 
-							<AppText className="font-interBold text-text text-sm mt-2">2. Zero Tracking</AppText>
+							<AppText className="font-interBold text-text mt-2 text-sm">2. Zero Tracking</AppText>
 							<AppText className="text-secondary text-xs leading-5">
-								We do not collect personal identifiers, usage telemetry, advertising IDs, or
-								analytics.
+								We do not collect personal identifiers, usage telemetry, advertising IDs, or analytics.
 							</AppText>
 
-							<AppText className="font-interBold text-text text-sm mt-2">3. Device Permissions</AppText>
+							<AppText className="font-interBold text-text mt-2 text-sm">3. Device Permissions</AppText>
 							<AppText className="text-secondary text-xs leading-5">
-								Notifications and exact alarm permissions are used solely to alert you of
-								tasks you explicitly scheduled.
+								Notifications and exact alarm permissions are used solely to alert you of tasks you
+								explicitly scheduled.
 							</AppText>
 
-							<AppText className="font-interBold text-text text-sm mt-2">4. Contact</AppText>
-							<AppText className="text-secondary text-xs leading-5 pb-6">
+							<AppText className="font-interBold text-text mt-2 text-sm">4. Contact</AppText>
+							<AppText className="text-secondary pb-6 text-xs leading-5">
 								For any privacy questions or data requests, contact us at:{"\n"}
 								<AppText className="font-interSBold text-primary">shahabasahx@gmail.com</AppText>
 							</AppText>
@@ -377,7 +353,7 @@ const SettingsPage = () => {
 			>
 				<View className="flex-1 justify-end bg-black/50">
 					<View className="border-border bg-surface max-h-[80%] rounded-t-3xl border-t p-6 shadow-2xl">
-						<View className="flex-row items-center justify-between pb-3 border-b border-border">
+						<View className="border-border flex-row items-center justify-between border-b pb-3">
 							<AppText className="font-interBold text-text text-xl">Terms & Conditions</AppText>
 							<Pressable onPress={() => setShowTermsModal(false)} className="p-1">
 								<Ionicons name="close" size={24} color="#64748B" />
@@ -387,25 +363,29 @@ const SettingsPage = () => {
 						<ScrollView className="mt-4 gap-3" showsVerticalScrollIndicator={false}>
 							<AppText className="font-interBold text-text text-sm">1. Acceptance of Terms</AppText>
 							<AppText className="text-secondary text-xs leading-5">
-								By using Taskt, you agree to these terms. Taskt is provided as a personal
-								offline task management utility.
+								By using Taskt, you agree to these terms. Taskt is provided as a personal offline task
+								management utility.
 							</AppText>
 
-							<AppText className="font-interBold text-text text-sm mt-2">2. Reliability of Reminders</AppText>
+							<AppText className="font-interBold text-text mt-2 text-sm">
+								2. Reliability of Reminders
+							</AppText>
 							<AppText className="text-secondary text-xs leading-5">
-								Taskt schedules reminders through Android's alarm system. Manufacturers
-								and battery-saver mechanisms may occasionally delay or suppress notifications
-								if battery optimization is enabled.
+								Taskt schedules reminders through Android&apos;s alarm system. Manufacturers and
+								battery-saver mechanisms may occasionally delay or suppress notifications if battery
+								optimization is enabled.
 							</AppText>
 
-							<AppText className="font-interBold text-text text-sm mt-2">3. Disclaimer of Warranties</AppText>
+							<AppText className="font-interBold text-text mt-2 text-sm">
+								3. Disclaimer of Warranties
+							</AppText>
 							<AppText className="text-secondary text-xs leading-5">
-								The app is provided "as is" without warranty of any kind. You are responsible
+								The app is provided &quot;as is&quot; without warranty of any kind. You are responsible
 								for backing up your critical tasks via the export feature.
 							</AppText>
 
-							<AppText className="font-interBold text-text text-sm mt-2">4. Support & Feedback</AppText>
-							<AppText className="text-secondary text-xs leading-5 pb-6">
+							<AppText className="font-interBold text-text mt-2 text-sm">4. Support & Feedback</AppText>
+							<AppText className="text-secondary pb-6 text-xs leading-5">
 								For support or feedback, reach out to:{"\n"}
 								<AppText className="font-interSBold text-primary">shahabasahx@gmail.com</AppText>
 							</AppText>

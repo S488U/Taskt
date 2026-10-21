@@ -1,10 +1,5 @@
 import React from "react";
-import Animated, {
-	Extrapolation,
-	interpolate,
-	useAnimatedStyle,
-	SharedValue,
-} from "react-native-reanimated";
+import Animated, { Extrapolation, interpolate, useAnimatedStyle, SharedValue } from "react-native-reanimated";
 import AppText from "../../AppText";
 
 export const ITEM_HEIGHT = 52;
@@ -28,10 +23,7 @@ const WheelItem = ({ item, index, scrollY, width, fontSize = 30 }: WheelItemProp
 
 	return (
 		<Animated.View
-			style={[
-				{ height: ITEM_HEIGHT, width, alignItems: "center", justifyContent: "center" },
-				animatedStyle,
-			]}
+			style={[{ height: ITEM_HEIGHT, width, alignItems: "center", justifyContent: "center" }, animatedStyle]}
 		>
 			<AppText className="font-interBold" style={{ fontSize }}>
 				{item}

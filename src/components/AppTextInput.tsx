@@ -2,9 +2,9 @@ import { forwardRef } from "react";
 import { TextInput, type TextInputInstance, type TextInputProps } from "react-native";
 
 type AppTextInputProps = TextInputProps & {
-	customClass? : string;
-	hasError? : boolean;
-}
+	customClass?: string;
+	hasError?: boolean;
+};
 
 const AppTextInput = forwardRef<TextInputInstance, AppTextInputProps>(
 	(
@@ -23,7 +23,7 @@ const AppTextInput = forwardRef<TextInputInstance, AppTextInputProps>(
 		return (
 			<TextInput
 				ref={ref}
-				className={`${customClass} ${multiline ? "h-32" : "h-14"} rounded-3xl border font-inter ${hasError ? "border-danger" : "border-border"} px-4 pl-4	pr-4 text-lg text-secondary caret-secondary`}
+				className={`${customClass} ${multiline ? "h-32" : "h-14"} font-inter rounded-3xl border ${hasError ? "border-danger" : "border-border"} text-secondary caret-secondary px-4 pr-4 pl-4 text-lg`}
 				textAlignVertical={multiline ? "top" : "center"}
 				placeholder={placeholder}
 				multiline={multiline}

@@ -2,12 +2,7 @@ import React, { memo, useState, useCallback } from "react";
 import { View, Pressable, LayoutChangeEvent } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, {
-	Extrapolation,
-	interpolate,
-	useAnimatedStyle,
-	SharedValue,
-} from "react-native-reanimated";
+import Animated, { Extrapolation, interpolate, useAnimatedStyle, SharedValue } from "react-native-reanimated";
 
 // components
 import AppText from "./AppText";

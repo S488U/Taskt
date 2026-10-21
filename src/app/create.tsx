@@ -1,7 +1,7 @@
-import CreateTask from "../features/tasks/CreateTask"
+import CreateTask from "../features/tasks/CreateTask";
 
 const CreateScreen = () => {
-    return <CreateTask />
+	return <CreateTask />;
 };
 
 export default CreateScreen;

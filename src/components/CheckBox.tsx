@@ -15,7 +15,7 @@ const CheckBox = ({ value, onChange }: checkBoxProps) => {
 			useNativeDriver: true,
 			friction: 6,
 		}).start();
-	}, [value]);
+	}, [value, scaleAnim]);
 
 	const toggleButton = () => {
 		onChange(!value);
