@@ -38,6 +38,16 @@ export const taskService = {
 			.where(eq(taskTable.id, id));
 	},
 
+	updateTask: async (id: string, updates: Partial<Omit<TaskEntity, "id" | "createdAt">>) => {
+		return await db
+			.update(taskTable)
+			.set({
+				...updates,
+				updatedAt: new Date().toISOString(),
+			})
+			.where(eq(taskTable.id, id));
+	},
+
 	deleteTask: async (id: string) => {
 		return await db.delete(taskTable).where(eq(taskTable.id, id));
 	},

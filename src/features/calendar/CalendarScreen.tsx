@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { View, Pressable, FlatList } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Temporal } from "@js-temporal/polyfill";
 
@@ -14,6 +14,7 @@ import type { TaskEntity, TaskStatus } from "../tasks/task.types";
 import { DAY_LABELS } from "../../utils/scheduleUtils";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
 import { getToday, getCalendarDates, formatSelectedDate } from "../../utils/temporal/datePicker";
+import { useTaskDraft } from "../../context/TaskDraftContext";
 
 const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const CELL_WIDTH_PERCENT = `${100 / 7}%`;
@@ -37,6 +38,7 @@ const CalendarScreen = () => {
 		Temporal.PlainYearMonth.from({ year: today.year, month: today.month })
 	);
 	const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+	const { loadDraft } = useTaskDraft();
 
 	const loadTasks = async () => {
 		try {
@@ -170,6 +172,11 @@ const CalendarScreen = () => {
 		} catch (error) {
 			console.error("Error deleting task in calendar:", error);
 		}
+	};
+
+	const handleEdit = (task: TaskEntity) => {
+		loadDraft(task);
+		router.push({ pathname: "/edit", params: { id: task.id } });
 	};
 
 	const isSelectedToday = selectedDateStr === todayStr;
@@ -344,7 +351,9 @@ const CalendarScreen = () => {
 					className="flex-1"
 					data={tasksForSelectedDate}
 					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => <Card item={item} onDelete={handleDelete} onToggle={handleToggle} />}
+					renderItem={({ item }) => (
+						<Card item={item} onDelete={handleDelete} onToggle={handleToggle} onPress={handleEdit} />
+					)}
 					contentContainerClassName="flex flex-col gap-2 pb-6 px-0.5"
 					showsVerticalScrollIndicator={false}
 					removeClippedSubviews={false}

@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, Pressable } from "react-native";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -88,7 +88,7 @@ const RightAction = ({ progress, dragX, cardWidth }) => {
 	);
 };
 
-const Card = ({ item, onDelete, onToggle }) => {
+const Card = ({ item, onDelete, onToggle, onPress }) => {
 	const [cardWidth, setCardWidth] = useState(0);
 	if (!item) return null;
 
@@ -128,7 +128,7 @@ const Card = ({ item, onDelete, onToggle }) => {
 				className={` ${strikeBg} border-border mb-2 h-max w-full flex-row gap-2 rounded-2xl p-3 shadow-lg`}
 			>
 				<CheckBox value={checked} onChange={handleToggle} />
-				<View className={` ${strikeBg} flex-1`}>
+				<Pressable onPress={() => onPress?.(item)} className={` ${strikeBg} flex-1`}>
 					<View className="flex flex-row items-center">
 						<AppText
 							className={`${strikeThroughText} font-interMedium text-text flex-1 text-lg capitalize`}
@@ -143,7 +143,7 @@ const Card = ({ item, onDelete, onToggle }) => {
 							{desc.length > 95 ? desc.substring(0, 95) + "..." : desc}
 						</AppText>
 					)}
-				</View>
+				</Pressable>
 			</View>
 		</Swipeable>
 	);
