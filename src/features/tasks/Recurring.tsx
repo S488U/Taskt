@@ -43,13 +43,10 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 
 	const isPast = useMemo(() => {
 		if (!hasInteracted || !draft.recurringDays.length || !draft.time) return false;
-		return !hasFutureOccurrence(
-			{
-				days: draft.recurringDays,
-				time: draft.time,
-			},
-			new Date()
-		);
+		return !hasFutureOccurrence({
+			days: draft.recurringDays,
+			time: draft.time,
+		});
 	}, [hasInteracted, draft.recurringDays, draft.time]);
 
 	useEffect(() => {
