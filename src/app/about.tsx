@@ -78,8 +78,8 @@ const AboutScreen = () => {
 					</AppText>
 				</View>
 
-				{/* Bottom: GitHub Repo Link & Offline Notice */}
-				<View className="gap-3">
+				{/* Bottom: GitHub Repo Link */}
+				<View>
 					<Pressable
 						onPress={handleOpenGitHub}
 						className="border-border active:bg-secondary/10 flex-row items-center justify-between rounded-2xl border bg-slate-50/70 px-4 py-3.5"
@@ -97,10 +97,6 @@ const AboutScreen = () => {
 						</View>
 						<MaterialIcons name="open-in-new" size={20} color="#64748B" />
 					</Pressable>
-
-					<AppText className="text-secondary/70 font-inter text-center text-xs">
-						100% Offline • SQLite Storage • Temporal API
-					</AppText>
 				</View>
 			</View>
 		</View>
