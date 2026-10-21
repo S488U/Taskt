@@ -113,8 +113,8 @@ const Card = ({ item, onDelete, onToggle }) => {
 	return (
 		<Swipeable
 			key={item.id}
-			overshootRight={true}
-			rightThreshold={40}
+			overshootRight={false}
+			rightThreshold={cardWidth > 0 ? cardWidth * 0.75 : 200}
 			onSwipeableOpen={() => {
 				onDelete?.(id);
 			}}
