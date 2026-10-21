@@ -11,7 +11,7 @@ import Card from "../../components/Card";
 // services & utils
 import { taskService } from "../../db/taskService";
 import type { TaskEntity, TaskStatus } from "../tasks/task.types";
-import { DAY_LABELS } from "../../utils/scheduleUtils";
+import { DAY_LABELS, isTaskCompletedForDate } from "../../utils/scheduleUtils";
 import { cancelTaskReminders, scheduleTaskReminder } from "../../utils/notificationService";
 import { getToday, getCalendarDates, formatSelectedDate } from "../../utils/temporal/datePicker";
 import { useTaskDraft } from "../../context/TaskDraftContext";
@@ -123,6 +123,13 @@ const CalendarScreen = () => {
 		return set;
 	}, [allTasks, calendarDates, isTaskOnDate]);
 
+	const isTaskDoneOnSelectedDate = useCallback(
+		(task: TaskEntity) => {
+			return isTaskCompletedForDate(task, selectedDate);
+		},
+		[selectedDate]
+	);
+
 	// Tasks for the selected date, filtered by kind and sorted (pending first, completed last)
 	const tasksForSelectedDate = useMemo(() => {
 		const filtered = allTasks.filter((task) => {
@@ -135,41 +142,57 @@ const CalendarScreen = () => {
 		});
 
 		return [...filtered].sort((a, b) => {
-			if (a.status === b.status) return 0;
-			return a.status === "done" ? 1 : -1;
+			const aDone = isTaskDoneOnSelectedDate(a);
+			const bDone = isTaskDoneOnSelectedDate(b);
+			if (aDone === bDone) return 0;
+			return aDone ? 1 : -1;
 		});
-	}, [allTasks, selectedDate, activeFilter, isTaskOnDate]);
+	}, [allTasks, selectedDate, activeFilter, isTaskOnDate, isTaskDoneOnSelectedDate]);
 
 	// Task actions (matching SavedTasks.tsx behavior)
 	const handleToggle = useCallback(
 		async (id: string, nextChecked: boolean) => {
 			triggerHaptic(hapticsEnabled, nextChecked ? "success" : "selection");
+			const nowStr = Temporal.Now.instant().toString();
 			const nextStatus: TaskStatus = nextChecked ? "done" : "pending";
 
 			let currentTask: TaskEntity | undefined;
 			setAllTasks((prev) => {
 				currentTask = prev.find((item) => item.id === id);
-				return prev.map((item) => (item.id === id ? { ...item, status: nextStatus } : item));
+				return prev.map((item) =>
+					item.id === id
+						? {
+								...item,
+								status: nextStatus,
+								completedAt: nextChecked ? nowStr : null,
+							}
+						: item
+				);
 			});
 
 			try {
 				await taskService.updateStatus(id, nextStatus);
 
-				if (nextChecked) {
-					if (currentTask?.notificationId) {
-						await cancelTaskReminders(currentTask.notificationId);
-						await taskService.updateNotificationId(id, null);
-					}
-				} else if (currentTask) {
-					const newNotificationId = await scheduleTaskReminder({
-						...currentTask,
-						status: "pending",
-					});
-					if (newNotificationId) {
-						await taskService.updateNotificationId(id, newNotificationId);
-						setAllTasks((prev) =>
-							prev.map((item) => (item.id === id ? { ...item, notificationId: newNotificationId } : item))
-						);
+				// Only cancel/reschedule notifications for ONE-TIME tasks
+				if (currentTask?.kind === "one_time") {
+					if (nextChecked) {
+						if (currentTask?.notificationId) {
+							await cancelTaskReminders(currentTask.notificationId);
+							await taskService.updateNotificationId(id, null);
+						}
+					} else if (currentTask) {
+						const newNotificationId = await scheduleTaskReminder({
+							...currentTask,
+							status: "pending",
+						});
+						if (newNotificationId) {
+							await taskService.updateNotificationId(id, newNotificationId);
+							setAllTasks((prev) =>
+								prev.map((item) =>
+									item.id === id ? { ...item, notificationId: newNotificationId } : item
+								)
+							);
+						}
 					}
 				}
 			} catch (error) {
@@ -213,9 +236,15 @@ const CalendarScreen = () => {
 
 	const renderItem = useCallback(
 		({ item }: { item: TaskEntity }) => (
-			<Card item={item} onDelete={handleDelete} onToggle={handleToggle} onPress={handleEdit} />
+			<Card
+				item={item}
+				checked={isTaskDoneOnSelectedDate(item)}
+				onDelete={handleDelete}
+				onToggle={handleToggle}
+				onPress={handleEdit}
+			/>
 		),
-		[handleDelete, handleToggle, handleEdit]
+		[handleDelete, handleToggle, handleEdit, isTaskDoneOnSelectedDate]
 	);
 
 	const isSelectedToday = selectedDateStr === todayStr;

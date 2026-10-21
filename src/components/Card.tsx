@@ -98,12 +98,13 @@ const RightAction: React.FC<RightActionProps> = ({ progress, dragX, cardWidth })
 
 export interface CardProps {
 	item: TaskEntity;
+	checked?: boolean;
 	onDelete?: (id: string) => void;
 	onToggle?: (id: string, nextValue: boolean) => void;
 	onPress?: (task: TaskEntity) => void;
 }
 
-const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
+const Card: React.FC<CardProps> = ({ item, checked: propsChecked, onDelete, onToggle, onPress }) => {
 	const [cardWidth, setCardWidth] = useState(0);
 
 	const onLayout = useCallback((e: LayoutChangeEvent) => {
@@ -114,7 +115,7 @@ const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
 	if (!item) return null;
 
 	const id = item.id;
-	const checked = item.status === "done";
+	const checked = propsChecked !== undefined ? propsChecked : item.status === "done";
 	const title = item.title?.trim() || "";
 	const desc = item.description?.trim();
 	const pattern = item.kind ? (item.kind === "one_time" ? "one-time" : "recurring") : "one-time";
@@ -172,6 +173,7 @@ const Card: React.FC<CardProps> = ({ item, onDelete, onToggle, onPress }) => {
 export default memo(Card, (prev, next) => {
 	return (
 		prev.item.id === next.item.id &&
+		prev.checked === next.checked &&
 		prev.item.status === next.item.status &&
 		prev.item.title === next.item.title &&
 		prev.item.description === next.item.description &&
