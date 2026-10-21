@@ -209,12 +209,9 @@ export async function requestBatteryOptimizationExemption(): Promise<void> {
 
 	try {
 		const pkg = Constants.expoConfig?.android?.package || "com.s488u.taskt";
-		await IntentLauncher.startActivityAsync(
-			IntentLauncher.ActivityAction.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-			{
-				data: `package:${pkg}`,
-			}
-		);
+		await IntentLauncher.startActivityAsync(IntentLauncher.ActivityAction.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, {
+			data: `package:${pkg}`,
+		});
 	} catch (error) {
 		console.warn("Could not request battery optimization exemption:", error);
 	}

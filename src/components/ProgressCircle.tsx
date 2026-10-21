@@ -38,7 +38,7 @@ const ProgressCircle = ({ progress = 0, completed = 0, total = 0 }: ProgressCirc
 			damping: 12,
 			stiffness: 180,
 		});
-	}, [safeProgress]);
+	}, [safeProgress, animatedProgress, labelScale]);
 
 	const animatedCircleProps = useAnimatedProps(() => ({
 		strokeDashoffset: circumference * (1 - animatedProgress.value),

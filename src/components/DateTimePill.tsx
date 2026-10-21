@@ -15,8 +15,8 @@ const DateTimePill = ({ data }: { data: DataTimePillProps }) => {
 	const { date, time } = parseDateTime(data.datetime, data.date, data.time);
 
 	return (
-		<View className="self-start rounded-md bg-border px-3 py-1">
-			<AppText className="font-interMedium text-xs text-secondary">
+		<View className="bg-border self-start rounded-md px-3 py-1">
+			<AppText className="font-interMedium text-secondary text-xs">
 				{date} | {time}
 			</AppText>
 		</View>

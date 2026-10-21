@@ -47,7 +47,7 @@ const EditTask = () => {
 			}
 		};
 		loadTaskFromDb();
-	}, [id]);
+	}, [id, loadDraft]);
 
 	useEffect(() => {
 		Animated.timing(patternAnim, {

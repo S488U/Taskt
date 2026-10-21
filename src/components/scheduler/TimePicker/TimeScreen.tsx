@@ -10,7 +10,7 @@ import { useTaskDraft } from "../../../context/TaskDraftContext";
 
 const TimeScreen = () => {
 	const timePickerRef = useRef<TimePickerRef>(null);
-	const [error, setError] = useState<string>("");
+	const [error] = useState<string>("");
 	const { updateDraft } = useTaskDraft();
 
 	const handleSelectPreset = (hour: number, minute: number, meridian: "AM" | "PM") => {

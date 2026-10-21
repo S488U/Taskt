@@ -57,9 +57,7 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 		triggerHaptic(hapticsEnabled, "selection");
 		setHasInteracted(true);
 		const currentDays = draft.recurringDays || [];
-		const days = currentDays.includes(day)
-			? currentDays.filter((d) => d !== day)
-			: [...currentDays, day];
+		const days = currentDays.includes(day) ? currentDays.filter((d) => d !== day) : [...currentDays, day];
 
 		updateDraft({
 			recurringMode: "custom",
@@ -76,7 +74,7 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 				recurringDays: presetDays,
 			});
 		}
-	}, [draft.recurringMode]);
+	}, [draft.recurringMode, updateDraft]);
 
 	return (
 		<>
@@ -130,11 +128,7 @@ const Recurring = ({ onErrorChange }: RecurringProps) => {
 					}}
 					className={`flex-row items-center justify-center gap-2 border ${isPast ? "border-danger" : "border-border"} bg-surface rounded-xl px-4 py-3`}
 				>
-					<FontAwesome6
-						name={clockIcon}
-						size={16}
-						color={isPast ? COLOR_DANGER : COLOR_SECONDARY}
-					/>
+					<FontAwesome6 name={clockIcon} size={16} color={isPast ? COLOR_DANGER : COLOR_SECONDARY} />
 					<AppText
 						className={`${isPast ? "text-danger" : "text-secondary"} font-interMedium text-center text-base uppercase`}
 					>

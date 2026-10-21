@@ -1,61 +1,59 @@
 {
-  "expo": {
-    "name": "Taskt",
-    "slug": "taskt",
-    "version": "0.0.1",
-    "scheme": "taskt",
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "experiments": {
-      "tsconfigPaths": true
-    },
-    "plugins": [
-      "./plugins/withGradleTuning",
-      "./plugins/withApkName",
-      "expo-router",
-      "expo-font",
-      "expo-sqlite",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/icon.png",
-          "color": "#6366F1"
-        }
-      ],
-      "expo-status-bar",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/splash.png",
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      "expo-asset"
-    ],
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.s488u.taskt"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.s488u.taskt"
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "726c512d-eda2-4884-8d22-a5b46d74ce38"
-      }
-    }
-  }
+	"expo": {
+		"name": "Taskt",
+		"slug": "taskt",
+		"version": "0.0.1",
+		"scheme": "taskt",
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"experiments": {
+			"tsconfigPaths": true
+		},
+		"plugins": [
+			"./plugins/withGradleTuning",
+			"./plugins/withApkName",
+			"expo-router",
+			"expo-font",
+			"expo-sqlite",
+			[
+				"expo-notifications",
+				{
+					"icon": "./assets/icon.png",
+					"color": "#6366F1"
+				}
+			],
+			"expo-status-bar",
+			[
+				"expo-splash-screen",
+				{
+					"image": "./assets/splash.png",
+					"resizeMode": "contain",
+					"backgroundColor": "#ffffff"
+				}
+			],
+			"expo-asset"
+		],
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"userInterfaceStyle": "automatic",
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true,
+			"bundleIdentifier": "com.s488u.taskt"
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"package": "com.s488u.taskt"
+		},
+		"extra": {
+			"router": {},
+			"eas": {
+				"projectId": "726c512d-eda2-4884-8d22-a5b46d74ce38"
+			}
+		}
+	}
 }

@@ -56,14 +56,12 @@ const AboutScreen = () => {
 					<AppText className="font-interBold text-text text-3xl">Taskt</AppText>
 
 					<View className="bg-primary/10 mt-2 mb-4 rounded-full px-3.5 py-1">
-						<AppText className="font-interSBold text-primary text-xs">
-							Version {appVersion}
-						</AppText>
+						<AppText className="font-interSBold text-primary text-xs">Version {appVersion}</AppText>
 					</View>
 
 					<AppText className="text-secondary font-inter text-center text-sm leading-6">
-						A local-first task management application focused on privacy, user experience, and
-						locale-aware productivity.
+						A local-first task management application focused on privacy, user experience, and locale-aware
+						productivity.
 					</AppText>
 				</View>
 
@@ -76,12 +74,8 @@ const AboutScreen = () => {
 						<View className="flex-row items-center gap-3">
 							<Ionicons name="logo-github" size={22} color="#0F172A" />
 							<View>
-								<AppText className="font-interMedium text-text text-sm">
-									GitHub Repository
-								</AppText>
-								<AppText className="text-secondary font-inter text-xs">
-									S488U / Taskt
-								</AppText>
+								<AppText className="font-interMedium text-text text-sm">GitHub Repository</AppText>
+								<AppText className="text-secondary font-inter text-xs">S488U / Taskt</AppText>
 							</View>
 						</View>
 						<MaterialIcons name="open-in-new" size={20} color="#64748B" />
