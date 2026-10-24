@@ -24,5 +24,9 @@ android
 .metro-health-check*
 
 # Isolating the copy of gradle property file from the project root folder.
-gradle.properties 
+gradle.properties
+
+# Documents
+*.docx
+ 
 
