@@ -1,0 +1,80 @@
+name: Build and Attach Release APKs
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Android project
+        run: bunx expo prebuild --platform android --clean
+
+      - name: Decode Release Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
+      - name: Build Split Release APKs
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease \
+            -PenableSplitApks=true \
+            -PreactNativeArchitectures=armeabi-v7a,arm64-v8a,x86,x86_64 \
+            -PTASKT_RELEASE_STORE_FILE=release.keystore \
+            -PTASKT_RELEASE_STORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}" \
+            -PTASKT_RELEASE_KEY_ALIAS="${{ secrets.KEY_ALIAS }}" \
+            -PTASKT_RELEASE_KEY_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
+
+      - name: Prepare APKs for Release
+        run: |
+          cd android/app/build/outputs/apk/release
+          [ -f app-arm64-v8a-release.apk ] && cp app-arm64-v8a-release.apk Taskt.apk || true
+          [ -f app-armeabi-v7a-release.apk ] && cp app-armeabi-v7a-release.apk Taskt-armeabi-v7a.apk || true
+          [ -f app-x86_64-release.apk ] && cp app-x86_64-release.apk Taskt-x86_64.apk || true
+          [ -f app-x86-release.apk ] && cp app-x86-release.apk Taskt-x86.apk || true
+          [ -f Taskt.apk ] && cp Taskt.apk Taskt-arm64-v8a.apk || true
+          ls -la
+
+      - name: Upload APKs to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            android/app/build/outputs/apk/release/Taskt.apk
+            android/app/build/outputs/apk/release/Taskt-arm64-v8a.apk
+            android/app/build/outputs/apk/release/Taskt-armeabi-v7a.apk
+            android/app/build/outputs/apk/release/Taskt-x86_64.apk
+            android/app/build/outputs/apk/release/Taskt-x86.apk
