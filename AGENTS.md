@@ -1,26 +1,23 @@
 # DONT WRITE CODE WITHOUT MY PERMISSION
 
-Hey, I mostly asks doubts regarding this project. And sometimes if i struggle.
-
+Hey, I mostly ask doubts regarding this project. And sometimes if i struggle;
 - I dont want you to write full code without my permission.
-- You can give small structure how it looks or it needs to be rather than the full code for the fix.
+- You can give small structure of how it looks, or it needs to be rather than the full code for the fix.
+
+And also I will ask you to do some chore works like preparing docs, reports or formatting regarding my college project as a companion. 
 
 ## ABOUT APPLICATION
 
-This is a task management application the tasks are saved locally and synced to users time and date.
+This is a Task Management Mobile Application that saves tasks locally and syncs with users time whether they are in different location, the task will fire the notification as they set it.
 
-On future I will implement cloud functionality.
-
-THE MVP is Task Management, edit, delete, save.
+On future I will implement cloud functionality without altering the offline first approach.
 
 ## CURRENT PLANNING
 
-1. Migrate JS code to TS. **DONE**
-2. use Temporal API everywhere rather than default Date() function, Prefer user's local time. The app works fully offline right now. So our users are from different parts of the planet with different locales, so the app is designed to boost their productivity by preferring their locales,
-3. Migrate to SQLite from Async Storage.
-4. Build Standalone DateTimePicker rather than relying on Android's default Date Time Picker. 
-5. Build reusable components. 
+Optimise code, fix bugs. 
 
 #### Note:
 
-This project is built on EXPO framework. WE use Tailwind CSS by using nativwind library.
+This project is built using Expo Framework. It built using TailwindCSS 4 using NativeWind 5 preview library. While the NativeWind is not compatible with Expo SDK 58, But we tuned `metro.config.cjs` config file and made the library to work it in this project. 
+
+When NativeWind finally suppports SDK 58, we will purge our local configuration and all.
