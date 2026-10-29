@@ -160,13 +160,12 @@ const SavedTasks = () => {
 		[hapticsEnabled]
 	);
 
-	const handleEdit = useCallback(
+	const handleViewTask = useCallback(
 		(task: TaskEntity) => {
 			triggerHaptic(hapticsEnabled, "selection");
-			loadDraft(task);
-			router.push({ pathname: "/edit", params: { id: task.id } });
+			router.push({ pathname: "/view", params: { id: task.id } });
 		},
-		[hapticsEnabled, loadDraft]
+		[hapticsEnabled]
 	);
 
 	const keyExtractor = useCallback((item: TaskEntity) => item.id, []);
@@ -178,10 +177,10 @@ const SavedTasks = () => {
 				checked={isTaskDone(item)}
 				onDelete={handleDelete}
 				onToggle={handleToggle}
-				onPress={handleEdit}
+				onPress={handleViewTask}
 			/>
 		),
-		[handleDelete, handleToggle, handleEdit, isTaskDone]
+		[handleDelete, handleToggle, handleViewTask, isTaskDone]
 	);
 
 	// State 1: Brand New User (Zero tasks exist anywhere in the app)
