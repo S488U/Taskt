@@ -1,7 +1,7 @@
 {
 	"name": "taskt",
 	"description": "A local first Task management application focused on user experience",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"scripts": {
 		"start": "expo start --android",
 		"build": "expo run:android",

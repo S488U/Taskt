@@ -12,7 +12,7 @@ const GITHUB_REPO_URL = "https://github.com/S488U/Taskt";
 
 const AboutScreen = () => {
 	const { hapticsEnabled } = useSettings();
-	const appVersion = Constants.expoConfig?.version ?? "0.1.0";
+	const appVersion = Constants.expoConfig?.version ?? "0.2.0";
 
 	const handleBack = () => {
 		triggerHaptic(hapticsEnabled, "impact");
