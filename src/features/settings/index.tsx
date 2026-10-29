@@ -21,6 +21,8 @@ const SettingsPage = () => {
 		setHapticsEnabled,
 		hideCompletedTasks,
 		setHideCompletedTasks,
+		hideRecurringCalendarDots,
+		setHideRecurringCalendarDots,
 	} = useSettings();
 
 	const [showClearModal, setShowClearModal] = useState(false);
@@ -113,7 +115,7 @@ const SettingsPage = () => {
 						</View>
 
 						{/* Hide Completed Tasks */}
-						<View className="flex-row items-center justify-between p-4">
+						<View className="border-border flex-row items-center justify-between border-b p-4">
 							<View className="flex-1 pr-3">
 								<AppText className="font-interMedium text-text text-base">Hide Completed Tasks</AppText>
 								<AppText className="text-secondary font-inter text-xs">
@@ -125,6 +127,23 @@ const SettingsPage = () => {
 								onValueChange={(val) => {
 									triggerHaptic(hapticsEnabled, "selection");
 									setHideCompletedTasks(val);
+								}}
+							/>
+						</View>
+
+						{/* Hide Recurring Calendar Dots */}
+						<View className="flex-row items-center justify-between p-4">
+							<View className="flex-1 pr-3">
+								<AppText className="font-interMedium text-text text-base">Hide Repeating Calendar Dots</AppText>
+								<AppText className="text-secondary font-inter text-xs">
+									Only show calendar dot markers for one-time tasks
+								</AppText>
+							</View>
+							<ToggleSwitch
+								value={hideRecurringCalendarDots}
+								onValueChange={(val) => {
+									triggerHaptic(hapticsEnabled, "selection");
+									setHideRecurringCalendarDots(val);
 								}}
 							/>
 						</View>

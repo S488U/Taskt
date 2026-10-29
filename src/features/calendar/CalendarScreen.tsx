@@ -41,7 +41,7 @@ const CalendarScreen = () => {
 	);
 	const [activeFilter, setActiveFilter] = useState<FilterType>("all");
 	const { loadDraft } = useTaskDraft();
-	const { hapticsEnabled } = useSettings();
+	const { hapticsEnabled, hideRecurringCalendarDots } = useSettings();
 
 	const loadTasks = async () => {
 		try {
@@ -113,15 +113,21 @@ const CalendarScreen = () => {
 		const set = new Set<string>();
 		if (allTasks.length === 0) return set;
 
+		const candidateTasks = hideRecurringCalendarDots
+			? allTasks.filter((task) => task.kind === "one_time")
+			: allTasks;
+
+		if (candidateTasks.length === 0) return set;
+
 		for (const date of calendarDates) {
 			const dateStr = date.toString();
-			const hasTask = allTasks.some((task) => isTaskOnDate(task, date));
+			const hasTask = candidateTasks.some((task) => isTaskOnDate(task, date));
 			if (hasTask) {
 				set.add(dateStr);
 			}
 		}
 		return set;
-	}, [allTasks, calendarDates, isTaskOnDate]);
+	}, [allTasks, calendarDates, isTaskOnDate, hideRecurringCalendarDots]);
 
 	const isTaskDoneOnSelectedDate = useCallback(
 		(task: TaskEntity) => {

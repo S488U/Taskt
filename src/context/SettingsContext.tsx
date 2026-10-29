@@ -10,12 +10,15 @@ interface SettingsContextType {
 	setHapticsEnabled: (val: boolean) => void;
 	hideCompletedTasks: boolean;
 	setHideCompletedTasks: (val: boolean) => void;
+	hideRecurringCalendarDots: boolean;
+	setHideRecurringCalendarDots: (val: boolean) => void;
 }
 
 const SETTING_GREETER_SIZE = "greeter_size";
 const SETTING_SHOW_PROGRESS_CARD = "show_progress_card";
 const SETTING_HAPTICS = "haptics_enabled";
 const SETTING_HIDE_COMPLETED_TASKS = "hide_completed_tasks";
+const SETTING_HIDE_RECURRING_CALENDAR_DOTS = "hide_recurring_calendar_dots";
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
@@ -24,6 +27,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 	const [showProgressCard, setShowProgressCardState] = useState<boolean>(true);
 	const [hapticsEnabled, setHapticsEnabledState] = useState<boolean>(true);
 	const [hideCompletedTasks, setHideCompletedTasksState] = useState<boolean>(false);
+	const [hideRecurringCalendarDots, setHideRecurringCalendarDotsState] = useState<boolean>(false);
 
 	useEffect(() => {
 		const initSettings = async () => {
@@ -45,6 +49,11 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			const savedHideCompleted = await loadSettings(SETTING_HIDE_COMPLETED_TASKS);
 			if (typeof savedHideCompleted === "boolean") {
 				setHideCompletedTasksState(savedHideCompleted);
+			}
+
+			const savedHideRecurringDots = await loadSettings(SETTING_HIDE_RECURRING_CALENDAR_DOTS);
+			if (typeof savedHideRecurringDots === "boolean") {
+				setHideRecurringCalendarDotsState(savedHideRecurringDots);
 			}
 		};
 
@@ -71,6 +80,11 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 		await storeSettings(SETTING_HIDE_COMPLETED_TASKS, val);
 	}, []);
 
+	const setHideRecurringCalendarDots = useCallback(async (val: boolean) => {
+		setHideRecurringCalendarDotsState(val);
+		await storeSettings(SETTING_HIDE_RECURRING_CALENDAR_DOTS, val);
+	}, []);
+
 	const contextValue = useMemo(
 		() => ({
 			greeterSize,
@@ -81,6 +95,8 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			setHapticsEnabled,
 			hideCompletedTasks,
 			setHideCompletedTasks,
+			hideRecurringCalendarDots,
+			setHideRecurringCalendarDots,
 		}),
 		[
 			greeterSize,
@@ -91,6 +107,8 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			setHapticsEnabled,
 			hideCompletedTasks,
 			setHideCompletedTasks,
+			hideRecurringCalendarDots,
+			setHideRecurringCalendarDots,
 		]
 	);
 
