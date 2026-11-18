@@ -28,6 +28,7 @@ android
 gradle.properties
 
 # Documents
+DOCS
 *.docx
  
 
