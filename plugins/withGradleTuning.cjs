@@ -7,6 +7,10 @@ const DEFAULTS = {
   "org.gradle.caching": "true",
   "org.gradle.configuration-cache": "false",
   reactNativeArchitectures: "arm64-v8a,x86_64",
+  "android.enableMinifyInReleaseBuilds": "true",
+  "android.enableShrinkResourcesInReleaseBuilds": "true",
+  "android.enableBundleCompression": "true",
+  "expo.gif.enabled": "false",
 };
 
 function setProperty(props, key, value) {
